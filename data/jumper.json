@@ -1,0 +1,22 @@
+{
+  "appd"  : "=$env:APPDATA",
+
+  "pfl"   : "=(Get-ChildItem $PROFILE).DirectoryName",
+  "psh"   : "=(Get-ChildItem $PROFILE).DirectoryName",
+
+  "cli"   : "C:\\CLI",
+  "cnf"   : "D:\\Alpha\\Conf",
+  "conf"  : "D:\\Alpha\\Conf",
+  "closk" : "D:\\JOB\\CLosk.Work\\Dev._default",
+  "cls"   : "D:\\JOB\\CLosk.Work\\Dev._default",
+  "ds"    : "D:\\JOB\\DS",
+  "gg"    : "D:\\JOB\\LAB\\GG",
+  "gh"    : "D:\\Alpha\\GitHub",
+  "its"   : "D:\\JOB\\DS\\IT-School\\Dev.DS-IT-School",
+  "pgf"   : "C:\\Program Files",
+  "qrn"   : "D:\\JOB\\DS\\Quran\\Dev.Quran",
+  "temp"  : "D:\\TMP",
+  "tmp"   : "D:\\TMP",
+  "tmpd"  : "D:\\TMP",
+  "wsa"   : "D:\\JOB\\WSA\\Dev"
+}
