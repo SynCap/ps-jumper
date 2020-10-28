@@ -71,6 +71,14 @@ function ~ ($Label, $Path) {
     }
 }
 
+function Add-Jumper ($Label, $Path) { $Global:Jumper.Add($Label, $Path) }
+function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
+function Clear-Jumper () {$Global:Jumper.Clear()}
+
+Set-Alias addj -Value Add-Jumper
+Set-Alias rmj -Value Remove-Jumper
+Set-Alias clrj -Value Clear-Jumper
+
 function Debug-Jumper {
     $MyInvocation
 }
