@@ -31,7 +31,7 @@ function Set-Jumper {
     )
 
     if (!(Test-Path $Path)) {
-        Write-Output "Jumper file `e[33m$Path`e[0m not found"
+        Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
 
@@ -42,7 +42,7 @@ function Set-Jumper {
             ForEach-Object { $Global:Jumper[$_.Name] = ( Invoke-Expression $_.Value.Substring(1) ) } -ErrorAction SilentlyContinue
     }
 
-    Write-Output ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
+    Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
 }
 
 function Get-Jumper($filter) {
