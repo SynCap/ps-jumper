@@ -51,20 +51,29 @@ function Get-Jumper($filter) {
 
 Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
-function ~ ($Label, $Path) {
-    # Вызов без метки -- уходим в $env:USERPROFILE
-    if ($null -eq $Label) { Set-Location ($env:USERPROFILE); return }
 
-
-    # метка указана, если есть -- прыгаем по ней,
-    # если такой нет -- ничего не делаем
+function ~ {
+    param (
+        [Parameter(position=0)]
+        $Label='~',
+        [Parameter(position=1)]
+        $Path,
+        [Alias('e')]
+        [Switch]
+        $EnforceJump=$false
+    )
+    # если метки нет -- ничего не делаем
     if ($Global:Jumper.Keys.Contains($Label)) {
         # если есть ещё добавка, пришпилим её к пути
         # например, если нам не надо прыгать, а просто получить
         # путь по метке можно сделать так: PS> ~ label .
         # Вернёт то же самое, что и $Jumper.label
         if ($null -ne $Path) {
-            Join-Path $Global:Jumper[$Label] $Path -Resolve
+            $target = Join-Path $Global:Jumper[$Label] $Path -Resolve
+            if ($EnforceJump) {
+                Set-Location ($target)
+            }
+            return ( $target )
         }
         # с одной только меткой, просто прыгаем по ней
         Set-Location ($Global:Jumper[$Label])
