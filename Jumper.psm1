@@ -18,6 +18,8 @@ $Global:Jumper = @{
     'qrn'    = 'D:\JOB\DS\Quran\Dev.Quran';
     'tmp'    = 'D:\TMP';
     'wsa'    = 'D:\JOB\WSA\Dev';
+    'evd'    = 'D:\Alpha\PowerShell\Modules\EveryDay';
+    'evd/tm' = 'D:\Alpha\PowerShell\Modules\EveryDay\Themes';
 }
 # $Global:J = $Global:Jumper;
 
