@@ -90,6 +90,3 @@ Set-Alias addj -Value Add-Jumper
 Set-Alias rmj -Value Remove-Jumper
 Set-Alias clrj -Value Clear-Jumper
 
-function Debug-Jumper {
-    $MyInvocation
-}
