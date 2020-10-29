@@ -4,7 +4,7 @@ $Global:Jumper = @{
 
     'psh'  = (Get-Item ($env:PSModulePath -Split ";")[0]).Parent;
     'psm'  = ($env:PSModulePath -Split ";")[0];
-    'jmpr' = $PSScriptRoot; #(Get-ItemProperty $ps | select *).DirectoryName;
+    'jmpr' = 'D:\JOB\PowerShell\Modules\Jumper\'; # (Get-ItemProperty $ps | select *).DirectoryName;
 
     'cli'    = 'C:\CLI';
     'closk'  = 'D:\JOB\CLosk.Work';
@@ -18,8 +18,8 @@ $Global:Jumper = @{
     'qrn'    = 'D:\JOB\DS\Quran\Dev.Quran';
     'tmp'    = 'D:\TMP';
     'wsa'    = 'D:\JOB\WSA\Dev';
-    'evd'    = 'D:\Alpha\PowerShell\Modules\EveryDay';
-    'evd/tm' = 'D:\Alpha\PowerShell\Modules\EveryDay\Themes';
+    'evd'    = 'D:\JOB\PowerShell\Modules\EveryDay';
+    'evd/tm' = 'D:\JOB\PowerShell\Modules\EveryDay\Themes';
 }
 # $Global:J = $Global:Jumper;
 
