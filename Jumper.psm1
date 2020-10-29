@@ -61,14 +61,14 @@ Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper li
 
 function ~ {
     param (
-        [Parameter(position=0)]      $Label='~',
-        [Parameter(position=1)]      $Path,
-        [Alias('e','Jump')] [Switch] $EnforceJump
+        [Parameter(position=0)] $Label='~',
+        [Parameter(position=1)] $Path,
+        [Alias('f')] [Switch]   $Force
     )
     if ($Global:Jumper.Keys.Contains($Label)) {
-        $EnforceJump = $EnforceJump -or (($null -eq $Path) -and ($null -eq $EnforceJump))
+        $Force = $Force -or (($null -eq $Path) -and ($null -eq $Force))
         $target = Join-Path $Global:Jumper[$Label] $Path -Resolve
-        if ($EnforceJump) {
+        if ($Force) {
             Set-Location $target
         } else {
             return $target
