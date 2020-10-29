@@ -59,40 +59,27 @@ function Get-Jumper($filter) {
 
 Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
-
 function ~ {
     param (
-        [Parameter(position=0)]
-        $Label='~',
-        [Parameter(position=1)]
-        $Path,
-        [Alias('e')]
-        [Switch]
-        $EnforceJump=$false
+        [Parameter(position=0)]      $Label='~',
+        [Parameter(position=1)]      $Path,
+        [Alias('e','Jump')] [Switch] $EnforceJump
     )
-    # если метки нет -- ничего не делаем
     if ($Global:Jumper.Keys.Contains($Label)) {
-        # если есть ещё добавка, пришпилим её к пути
-        # например, если нам не надо прыгать, а просто получить
-        # путь по метке можно сделать так: PS> ~ label .
-        # Вернёт то же самое, что и $Jumper.label
-        if ($null -ne $Path) {
-            $target = Join-Path $Global:Jumper[$Label] $Path -Resolve
-            if ($EnforceJump) {
-                Set-Location ($target)
-            }
-            return ( $target )
+        $EnforceJump = $EnforceJump -or (($null -eq $Path) -and ($null -eq $EnforceJump))
+        $target = Join-Path $Global:Jumper[$Label] $Path -Resolve
+        if ($EnforceJump) {
+            Set-Location $target
+        } else {
+            return $target
         }
-        # с одной только меткой, просто прыгаем по ней
-        Set-Location ($Global:Jumper[$Label])
     }
 }
 
 function Add-Jumper ($Label, $Path) { $Global:Jumper.Add($Label, $Path) }
 function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
-function Clear-Jumper () {$Global:Jumper.Clear()}
+function Clear-Jumper {$Global:Jumper.Clear()}
 
 Set-Alias addj -Value Add-Jumper
 Set-Alias rmj -Value Remove-Jumper
 Set-Alias clrj -Value Clear-Jumper
-
