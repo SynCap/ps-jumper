@@ -25,11 +25,18 @@ $Global:Jumper = @{
 
 $DataDir = Join-Path $PSScriptRoot 'data'
 
+function Expand-JumperLinks {
+    $Global:Jumper.GetEnumerator() |
+        Where-Object { $_.Value[0] -eq '=' } |
+            ForEach-Object {
+                $Global:Jumper[$_.Name] = ( Invoke-Expression $_.Value.Substring(1) )
+            } -ErrorAction SilentlyContinue
+}
+
 function Set-Jumper {
     param (
         $Path = ( Join-Path $DataDir 'jumper.json' ),
-        [Switch]
-        $EvaluatedJumpers
+        [Ailas('a')] [Switch] $Append
     )
 
     if (!(Test-Path $Path)) {
@@ -37,12 +44,11 @@ function Set-Jumper {
         return
     }
 
-    $Global:Jumper = (Get-Content $Path | ConvertFrom-Json -AsHashtable)
+    if (!$Append) { $Global:Jumper.Clear() }
 
-    if ($EvaluatedJumpers) {
-        $Global:Jumper.GetEnumerator() | Where-Object { $_.Value[0] -eq '=' } |
-            ForEach-Object { $Global:Jumper[$_.Name] = ( Invoke-Expression $_.Value.Substring(1) ) } -ErrorAction SilentlyContinue
-    }
+    $Global:Jumper = (Get-Content $Path | if ($Path.Split('.')[-1] -ieq 'json') {ConvertFrom-Json -AsHashtable} else {ConvertFrom-StringData})
+
+    Expand-JumperLinks
 
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
 }
