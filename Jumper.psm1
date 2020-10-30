@@ -21,7 +21,7 @@ $Global:Jumper = @{
     'evd'    = 'D:\JOB\PowerShell\Modules\EveryDay';
     'evd/tm' = 'D:\JOB\PowerShell\Modules\EveryDay\Themes';
 }
-# $Global:J = $Global:Jumper;
+$Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
 
@@ -44,12 +44,11 @@ function Set-Jumper {
     }
     if (!$Append) { $Global:Jumper.Clear() }
     $Global:Jumper = (
-        ($Path.Split('.')[-1] -ieq 'json') ? (
-            Get-Content $Path | ConvertFrom-Json -AsHashtable
-        ) : (
-            Get-Content $Path | ConvertFrom-StringData
-        ))
-    if ($Global:Jumper.Count) { Expand-JumperLinks }
+        ('json' -ieq ($Path.Split('.')[-1])) ?
+            ( Get-Content $Path -Verbose | ConvertFrom-Json -AsHashtable ) :
+            ( Get-Content $Path | ConvertFrom-StringData )
+    )
+    # if ($Global:Jumper.Count) { Expand-JumperLinks }
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
 }
 
@@ -57,9 +56,7 @@ function Get-Jumper($filter) {
     $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } | Sort-Object Name
 }
 
-Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
-
-function ~ {
+function Use-Jumper {
     param (
         [Parameter(position=0)] $Label='~',
         [Parameter(position=1)] $Path='',
@@ -80,6 +77,11 @@ function Add-Jumper ($Label, $Path) { $Global:Jumper.Add($Label, $Path) }
 function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
 function Clear-Jumper {$Global:Jumper.Clear()}
 
-Set-Alias addj -Value Add-Jumper
-Set-Alias rmj -Value Remove-Jumper
-Set-Alias clrj -Value Clear-Jumper
+Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
+
+Set-Alias  ~  -Value Use-Jumper    -Description 'Jump to target using label and added path or get the resolved path'
+Set-Alias ajr -Value Add-Jumper    -Description ''
+Set-Alias sjr -Value Set-Jumper    -Description ''
+Set-Alias cjr -Value Clear-Jumper  -Description ''
+Set-Alias gjr -Value Get-Jumper    -Description ''
+Set-Alias rjr -Value Remove-Jumper -Description ''
