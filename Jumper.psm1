@@ -36,7 +36,7 @@ function Expand-JumperLinks {
 function Set-Jumper {
     param (
         $Path = ( Join-Path $DataDir 'jumper.json' ),
-        [Ailas('a')] [Switch] $Append
+        [Alias('a')] [Switch] $Append
     )
 
     if (!(Test-Path $Path)) {
