@@ -7,9 +7,8 @@
 "pgfl" : "%ProgramFiles%",
 "temp" : "%Temp%",
 
-"cli"    : "C:\\CLI",
 "evd"    : "D:\\JOB\\PowerShell\\Modules\\EveryDay",
 "evd/tm" : "D:\\JOB\\PowerShell\\Modules\\EveryDay\\Themes",
 "jmpr"   : "D:\\JOB\\PowerShell\\Modules\\Jumper\\",
-"tmp"    : "C:\\TMP"
+"tmp"    : "D:\\Tmp"
 }
