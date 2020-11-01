@@ -36,7 +36,10 @@ function Read-JumperFile {
 }
 
 function Get-Jumper($filter) {
-    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } | Sort-Object Name
+    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } |
+        %{
+            [PSCustomObject]@{ 'Label'= $_.Name; 'Link'= $_.Value; 'Target'= Expand-JumperLink $_.Name }
+        } | Sort-Object Label
 }
 
 function Set-Jumper {
@@ -107,7 +110,7 @@ function Use-Jumper {
     }
 }
 
-Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
+Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~   -Value Use-Jumper          -Description 'Jump to target using label and added path or get the resolved path'
 Set-Alias ajr  -Value Add-Jumper          -Description 'Add label to jumper list'
