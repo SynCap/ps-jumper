@@ -62,9 +62,9 @@ function Read-JumperFile {
         return
     }
     if (!$Append) { $Global:Jumper.Clear() }
-    $Global:Jumper += ('json' -ieq ($Path.Split('.')[-1])) ?
-            $( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
-            $( Get-Content $Path | ConvertFrom-StringData )
+    $Global:Jumper += (('json' -ieq ($Path.Split('.')[-1])) ?
+            ( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
+            ( Get-Content $Path | Select-String | ConvertFrom-StringData ))
     # if ($Global:Jumper.Count) { Expand-JumperLinks }
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
     $Global:Jumper
