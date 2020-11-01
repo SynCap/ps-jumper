@@ -72,7 +72,7 @@ function Read-JumperFile {
         return
     }
     if (!$Append) { $Global:Jumper.Clear() }
-    $Global:Jumper = ('json' -ieq ($Path.Split('.')[-1])) ?
+    $Global:Jumper += ('json' -ieq ($Path.Split('.')[-1])) ?
             $( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
             $( Get-Content $Path | ConvertFrom-StringData )
     # if ($Global:Jumper.Count) { Expand-JumperLinks }
