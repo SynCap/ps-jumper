@@ -39,26 +39,6 @@ function Get-Jumper($filter) {
     $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } | Sort-Object Name
 }
 
-function Use-Jumper {
-    param (
-        [Parameter(position=0)] $Label='~',
-        [Parameter(position=1)] $Path='',
-        [Alias('f')] [Switch]   $Force=$false,
-        [Alias('s')] [Switch]   $AsString=$false
-    )
-    if ($Global:Jumper.Keys.Contains($Label)) {
-        $Force = $Force -or (('' -eq $Path) -and !$Force)
-        $Target =  $Path ?
-            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
-            (Expand-JumperLink $Label)
-        if ($Force -and !$AsString) {
-            Set-Location $Target
-        } else {
-            return $Target
-        }
-    }
-}
-
 function Set-Jumper {
     param(
         [Parameter(mandatory,position=0)]                   $Label,
@@ -104,6 +84,26 @@ function Expand-JumperLink  {
 function Resolve-JumperLinks {
     foreach ($Label in $Global:Jumper.Keys) {
         $Global:Jumper[$Label] = Expand-JumperLink $Label
+    }
+}
+
+function Use-Jumper {
+    param (
+        [Parameter(position=0)] $Label='~',
+        [Parameter(position=1)] $Path='',
+        [Alias('f')] [Switch]   $Force=$false,
+        [Alias('s')] [Switch]   $AsString=$false
+    )
+    if ($Global:Jumper.Keys.Contains($Label)) {
+        $Force = $Force -or (('' -eq $Path) -and !$Force)
+        $Target =  $Path ?
+            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
+            (Expand-JumperLink $Label)
+        if ($Force -and !$AsString) {
+            Set-Location $Target
+        } else {
+            return $Target
+        }
     }
 }
 
