@@ -52,8 +52,10 @@ function Read-JumperFile {
         $Path = ( Join-Path $DataDir 'jumper.json' ),
         [Alias('a')] [Switch] $Append
     )
-    if (Test-Path (Join-Path $DataDir $Path)) {
-        $Path = Join-Path $DataDir $Path
+    if (Test-Path ($tp = Join-Path $DataDir $Path)) {
+        $Path = $tp
+    } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.json")) {
+        $Path = $tp
     }
     if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
