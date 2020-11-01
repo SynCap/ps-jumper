@@ -4,31 +4,33 @@
   "tmp"  : "%TEMP%",
 
   "appd" : "=$env:APPDATA",
+  "psh"  : "=(Get-ChildItem $PROFILE).DirectoryName",
 
   "mydocs" : "=[Environment]::GetFolderPath('personal')",
   "pics"   : "=[Environment]::GetFolderPath('MyPictures')",
   "imgs"   : "=[Environment]::GetFolderPath('MyPictures')",
-  "arts"   : "=(Join-Path [Environment]::GetFolderPath('MyPictures') Arts",
-  "flm"    : "=(Join-Path [Environment]::GetFolderPath('MyVideo') Flm",
-  "mlt"    : "=(Join-Path [Environment]::GetFolderPath('MyVideo') Mlt",
-  "psh"    : "=(Get-ChildItem $PROFILE).DirectoryName",
 
-  "jmpr"   : "D:\\JOB\\PowerShell\\Modules\\Jumper",
-  "jmpr/d" : "D:\\JOB\\PowerShell\\Modules\\Jumper\\Data",
-  "evd"    : "D:\\JOB\\PowerShell\\Modules\\EveryDay",
-  "evd/tm" : "D:\\JOB\\PowerShell\\Modules\\EveryDay\\Themes",
+  "arts" : "=Join-Path [Environment]::GetFolderPath('MyPictures') Arts",
+  "flm"  : "=Join-Path [Environment]::GetFolderPath('MyVideo') Flm",
+  "mlt"  : "=Join-Path [Environment]::GetFolderPath('MyVideo') Mlt",
+
+
   "cli"    : "C:\\CLI",
   "cnf"    : "D:\\Alpha\\Conf",
   "conf"   : "D:\\Alpha\\Conf",
+  "gh"     : "D:\\Alpha\\GitHub",
   "closk"  : "D:\\JOB\\CLosk.Work\\Dev._default",
   "cls"    : "D:\\JOB\\CLosk.Work\\Dev._default",
   "ds"     : "D:\\JOB\\DS",
-  "gg"     : "D:\\JOB\\LAB\\GG",
-  "gh"     : "D:\\Alpha\\GitHub",
   "its"    : "D:\\JOB\\DS\\IT-School\\Dev.DS-IT-School",
   "qrn"    : "D:\\JOB\\DS\\Quran\\Dev.Quran",
-  "tmpd"   : "D:\\TMP",
+  "gg"     : "D:\\JOB\\LAB\\GG",
+  "evd"    : "D:\\JOB\\PowerShell\\Modules\\EveryDay",
+  "evd/tm" : "D:\\JOB\\PowerShell\\Modules\\EveryDay\\Themes",
+  "jmpr"   : "D:\\JOB\\PowerShell\\Modules\\Jumper",
+  "jmpr/d" : "D:\\JOB\\PowerShell\\Modules\\Jumper\\Data",
   "wsa"    : "D:\\JOB\\WSA\\Dev",
+  "tmpd"   : "D:\\TMP",
 
   "reg/win" : "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\"
 }
