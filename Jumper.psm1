@@ -1,26 +1,9 @@
-# $Global:Jumper = @{
-#     'appd' = $env:APPDATA;
-#     'temp' = $env:TEMP;
-
-#     'psh'  = (Get-Item ($env:PSModulePath -Split ";")[0]).Parent;
-#     'psm'  = ($env:PSModulePath -Split ";")[0];
-#     'jmpr' = 'D:\JOB\PowerShell\Modules\Jumper\'; # (Get-ItemProperty $ps | select *).DirectoryName;
-
-#     'cli'    = 'C:\CLI';
-#     'closk'  = 'D:\JOB\CLosk.Work';
-#     'closkd' = 'D:\JOB\CLosk.Work\Dev._default';
-#     'ds'     = 'D:\JOB\DS';
-#     'fnt'    = 'D:\Downloads\Fonts\Styled\Mono';
-#     'gg'     = 'D:\JOB\LAB\GG';
-#     'gh'     = 'D:\Alpha\GitHub';
-#     'its'    = 'D:\JOB\DS\IT-School\Dev.DS-IT-School';
-#     'pgf'    = 'C:\Program Files';
-#     'qrn'    = 'D:\JOB\DS\Quran\Dev.Quran';
-#     'tmp'    = 'D:\TMP';
-#     'wsa'    = 'D:\JOB\WSA\Dev';
-#     'evd'    = 'D:\JOB\PowerShell\Modules\EveryDay';
-#     'evd/tm' = 'D:\JOB\PowerShell\Modules\EveryDay\Themes';
-# }
+<#
+    Jumper
+    PowerShell Console filesystem folders quick links.
+    (c)CLosk, 2020
+    https://github.com/SynCap/ps-jumper
+#>
 
 $Global:Jumper = @{}
 $Global:J = $Global:Jumper;
