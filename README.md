@@ -34,7 +34,7 @@ TODO:
 	# target path can be valid path of any type of providers:
 	reg/win = HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion
 
-## Samle usage
+## Sample usage
 
 Jump to home (User Profile) dir:
 
@@ -62,4 +62,10 @@ To get path without jump to target use `-ToString` switch or its alias - `-s`.
 Force change location even additional path given (`-Force` or `-f` switch)
 
 	PS: ~ > ~ appd nuget -f
+	PS: C:\Users\SynCap\AppData\Roaming\NuGet >
 
+Use shortcuts in commands and code:
+
+	PS> Get-ChildItem (~ appd .)
+	...
+	PS> ls
