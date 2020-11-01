@@ -78,12 +78,13 @@ function Use-Jumper {
     param (
         [Parameter(position=0)] $Label='~',
         [Parameter(position=1)] $Path='',
-        [Alias('f')] [Switch]   $Force=$false
+        [Alias('f')] [Switch]   $Force=$false,
+        [Alias('s')] [Switch]   $AsString=$false
     )
     if ($Global:Jumper.Keys.Contains($Label)) {
         $Force = $Force -or (('' -eq $Path) -and !$Force)
-        $Target = $Path ? (Join-Path $Global:Jumper[$Label] $Path -Resolve) : $Global:Jumper[$Label]
-        if ($Force) {
+        $Target =  $Path ? (Join-Path (Expand-JumperLink $Global:Jumper[$Label]) $Path -Resolve) : (Expand-JumperLink $Global:Jumper[$Label])
+        if ($Force -and !$AsString) {
             Set-Location $Target
         } else {
             return $Target
