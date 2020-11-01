@@ -12,24 +12,6 @@ $DataDir = Join-Path $PSScriptRoot 'data'
 
 function .hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
 
-function Expand-JumperLink  {
-    param (
-        [Parameter(Mandatory,ValueFromPipeline,Position=0)]
-        $Label
-    )
-    if ('=' -eq $Global:Jumper[$Label][0]) {
-        ( Invoke-Expression ( $Global:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
-    } else {
-        [System.Environment]::ExpandEnvironmentVariables($Global:Jumper[$Label])
-    }
-}
-
-function Resolve-JumperLinks {
-    foreach ($Label in $Global:Jumper.Keys) {
-        $Global:Jumper[$Label] = Expand-JumperLink $Label
-    }
-}
-
 function Read-JumperFile {
     param (
         $Path = ( Join-Path $DataDir 'jumper.json' ),
@@ -105,6 +87,24 @@ function Save-JumperList {
 
     Write-Verbose $Path
     ConvertTo-Json $Global:Jumper | Set-Content -Path $Path
+}
+
+function Expand-JumperLink  {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)]
+        $Label
+    )
+    if ('=' -eq $Global:Jumper[$Label][0]) {
+        ( Invoke-Expression ( $Global:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
+    } else {
+        [System.Environment]::ExpandEnvironmentVariables($Global:Jumper[$Label])
+    }
+}
+
+function Resolve-JumperLinks {
+    foreach ($Label in $Global:Jumper.Keys) {
+        $Global:Jumper[$Label] = Expand-JumperLink $Label
+    }
 }
 
 Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
