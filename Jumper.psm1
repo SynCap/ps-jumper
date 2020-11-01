@@ -29,7 +29,11 @@ $DataDir = Join-Path $PSScriptRoot 'data'
 
 function .hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
 
-function Expand-JumperLink ([Parameter(Mandatory,ValueFromPipeline)]$Label) {
+function Expand-JumperLink  {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)]
+        $Label
+    )
     if ('=' -eq $Global:Jumper[$Label][0]) {
         ( Invoke-Expression ( $Global:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
     } else {
