@@ -10,9 +10,9 @@
   "pics"   : "=[Environment]::GetFolderPath('MyPictures')",
   "imgs"   : "=[Environment]::GetFolderPath('MyPictures')",
 
-  "arts" : "=Join-Path [Environment]::GetFolderPath('MyPictures') Arts",
-  "flm"  : "=Join-Path [Environment]::GetFolderPath('MyVideo') Flm",
-  "mlt"  : "=Join-Path [Environment]::GetFolderPath('MyVideo') Mlt",
+  "arts" : "=Join-Path ([Environment]::GetFolderPath('MyPictures')) Arts",
+  "flm"  : "=Join-Path ([Environment]::GetFolderPath('MyVideo')) Flm",
+  "mlt"  : "=Join-Path ([Environment]::GetFolderPath('MyVideo')) Mlt",
 
 
   "cli"    : "C:\\CLI",
