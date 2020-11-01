@@ -1,0 +1,14 @@
+{
+"appd" : "=$env:APPDATA",
+
+"pfl" : "=(Get-ChildItem $PROFILE).DirectoryName",
+"psh" : "=(Get-ChildItem $PROFILE).DirectoryName",
+
+"pgfl" : "%ProgramFiles%",
+"temp" : "%Temp%",
+
+"evd"    : "D:\\JOB\\PowerShell\\Modules\\EveryDay",
+"evd/tm" : "D:\\JOB\\PowerShell\\Modules\\EveryDay\\Themes",
+"jmpr"   : "D:\\JOB\\PowerShell\\Modules\\Jumper\\",
+"tmp"    : "D:\\Tmp"
+}
