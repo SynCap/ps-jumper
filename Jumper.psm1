@@ -107,7 +107,7 @@ function Use-Jumper {
     }
 }
 
-Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
+Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~   -Value Use-Jumper          -Description 'Jump to target using label and added path or get the resolved path'
 Set-Alias ajr  -Value Add-Jumper          -Description 'Add label to jumper list'
