@@ -21,6 +21,8 @@ function Read-JumperFile {
         $Path = $tp
     } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.json")) {
         $Path = $tp
+    } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.ini")) {
+        $Path = $tp
     }
     if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
