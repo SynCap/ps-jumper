@@ -1,26 +1,28 @@
-$Global:Jumper = @{
-    'appd' = $env:APPDATA;
-    'temp' = $env:TEMP;
+# $Global:Jumper = @{
+#     'appd' = $env:APPDATA;
+#     'temp' = $env:TEMP;
 
-    'psh'  = (Get-Item ($env:PSModulePath -Split ";")[0]).Parent;
-    'psm'  = ($env:PSModulePath -Split ";")[0];
-    'jmpr' = 'D:\JOB\PowerShell\Modules\Jumper\'; # (Get-ItemProperty $ps | select *).DirectoryName;
+#     'psh'  = (Get-Item ($env:PSModulePath -Split ";")[0]).Parent;
+#     'psm'  = ($env:PSModulePath -Split ";")[0];
+#     'jmpr' = 'D:\JOB\PowerShell\Modules\Jumper\'; # (Get-ItemProperty $ps | select *).DirectoryName;
 
-    'cli'    = 'C:\CLI';
-    'closk'  = 'D:\JOB\CLosk.Work';
-    'closkd' = 'D:\JOB\CLosk.Work\Dev._default';
-    'ds'     = 'D:\JOB\DS';
-    'fnt'    = 'D:\Downloads\Fonts\Styled\Mono';
-    'gg'     = 'D:\JOB\LAB\GG';
-    'gh'     = 'D:\Alpha\GitHub';
-    'its'    = 'D:\JOB\DS\IT-School\Dev.DS-IT-School';
-    'pgf'    = 'C:\Program Files';
-    'qrn'    = 'D:\JOB\DS\Quran\Dev.Quran';
-    'tmp'    = 'D:\TMP';
-    'wsa'    = 'D:\JOB\WSA\Dev';
-    'evd'    = 'D:\JOB\PowerShell\Modules\EveryDay';
-    'evd/tm' = 'D:\JOB\PowerShell\Modules\EveryDay\Themes';
-}
+#     'cli'    = 'C:\CLI';
+#     'closk'  = 'D:\JOB\CLosk.Work';
+#     'closkd' = 'D:\JOB\CLosk.Work\Dev._default';
+#     'ds'     = 'D:\JOB\DS';
+#     'fnt'    = 'D:\Downloads\Fonts\Styled\Mono';
+#     'gg'     = 'D:\JOB\LAB\GG';
+#     'gh'     = 'D:\Alpha\GitHub';
+#     'its'    = 'D:\JOB\DS\IT-School\Dev.DS-IT-School';
+#     'pgf'    = 'C:\Program Files';
+#     'qrn'    = 'D:\JOB\DS\Quran\Dev.Quran';
+#     'tmp'    = 'D:\TMP';
+#     'wsa'    = 'D:\JOB\WSA\Dev';
+#     'evd'    = 'D:\JOB\PowerShell\Modules\EveryDay';
+#     'evd/tm' = 'D:\JOB\PowerShell\Modules\EveryDay\Themes';
+# }
+
+$Global:Jumper = @{}
 $Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
@@ -129,3 +131,7 @@ Set-Alias rjr  -Value Remove-Jumper      -Description 'Remove record from jumper
 Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
 Set-Alias rvjr -Value Expand-JumperLinks -Description 'Expand all links in list'
 Set-Alias sjr  -Value Set-Jumper         -Description ''
+Set-Alias svjr -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
+
+# Read default Data
+rdjr jumper.json
