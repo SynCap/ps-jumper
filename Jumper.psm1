@@ -27,21 +27,35 @@ $DataDir = Join-Path $PSScriptRoot 'data'
 
 function .hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
 
-function Expand-JumperLinks {
-    $Res = @{}
-    foreach ($Item in $Global:Jumper.GetEnumerator()) {
-        println $Item.Name,"`t= `e[91m",$Item.Value,"`e[0m"
-        if ('=' -eq $Item.Value[0]) {
-            $Res[$Item.Name] = ( Invoke-Expression ( $Item.Value.Substring(1) ) -ErrorAction SilentlyContinue )
-        } else {
-            $Res[$Item.Name] = [System.Environment]::ExpandEnvironmentVariables($Item.Value)
-        }
-        println $Item.Name,"`t= `e[93m",$Res[$Item.Name],"`e[0m"
+function Expand-JumperLink ([Parameter(Mandatory,ValueFromPipeline)]$Label) {
+    if ('=' -eq $Global:Jumper[$Label][0]) {
+        ( Invoke-Expression ( $Global:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
+    } else {
+        [System.Environment]::ExpandEnvironmentVariables($Global:Jumper[$Label])
     }
-    $Global:Jumper = $Res
-    .hr
-    Jumper
 }
+
+function Resolve-JumperLinks {
+    foreach ($Label in $Global:Jumper.Keys) {
+        $Global:Jumper[$Label] = Expand-JumperLink $Label
+    }
+}
+
+# function Expand-JumperLinks {
+#     $Res = @{}
+#     foreach ($Item in $Global:Jumper.GetEnumerator()) {
+#         println $Item.Name,"`t= `e[91m",$Item.Value,"`e[0m"
+#         if ('=' -eq $Item.Value[0]) {
+#             $Res[$Item.Name] = ( Invoke-Expression ( $Item.Value.Substring(1) ) -ErrorAction SilentlyContinue )
+#         } else {
+#             $Res[$Item.Name] = [System.Environment]::ExpandEnvironmentVariables($Item.Value)
+#         }
+#         println $Item.Name,"`t= `e[93m",$Res[$Item.Name],"`e[0m"
+#     }
+#     $Global:Jumper = $Res
+#     .hr
+#     Jumper
+# }
 
 function Read-JumperFile {
     param (
@@ -112,5 +126,6 @@ Set-Alias rdjr -Value Read-JumperFile    -Description 'Set or enhance jumper lab
 Set-Alias cjr  -Value Clear-Jumper       -Description 'Clear jumper label list'
 Set-Alias gjr  -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
 Set-Alias rjr  -Value Remove-Jumper      -Description 'Remove record from jumper label list by label'
-Set-Alias ejr  -Value Expand-JumperLinks -Description 'Expand path variables and evaluate expressions in values of jumper links'
+Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
+Set-Alias rvjr -Value Expand-JumperLinks -Description 'Expand all links in list'
 Set-Alias sjr  -Value Set-Jumper         -Description ''
