@@ -43,7 +43,7 @@ function Expand-JumperLinks {
     Jumper
 }
 
-function Set-Jumper {
+function Read-JumperFile {
     param (
         $Path = ( Join-Path $DataDir 'jumper.json' ),
         [Alias('a')] [Switch] $Append
@@ -83,15 +83,32 @@ function Use-Jumper {
     }
 }
 
-function Add-Jumper ($Label, $Path) { $Global:Jumper.Add($Label, $Path) }
+function Set-Jumper {
+    param(
+        [Parameter(mandatory,position=0)]                   $Label,
+        [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
+    )
+    $Global:Jumper.SetValue($Label, $Path)
+}
+
+function Add-Jumper  {
+    param(
+        [Parameter(mandatory,position=0)]                   $Label,
+        [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
+    )
+    $Global:Jumper.Add($Label, $Path)
+}
+
 function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
 function Clear-Jumper {$Global:Jumper.Clear()}
 
 Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
-Set-Alias  ~  -Value Use-Jumper    -Description 'Jump to target using label and added path or get the resolved path'
-Set-Alias ajr -Value Add-Jumper    -Description ''
-Set-Alias sjr -Value Set-Jumper    -Description ''
-Set-Alias cjr -Value Clear-Jumper  -Description ''
-Set-Alias gjr -Value Get-Jumper    -Description ''
-Set-Alias rjr -Value Remove-Jumper -Description ''
+Set-Alias  ~   -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
+Set-Alias ajr  -Value Add-Jumper         -Description 'Add label to jumper list'
+Set-Alias rdjr -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
+Set-Alias cjr  -Value Clear-Jumper       -Description 'Clear jumper label list'
+Set-Alias gjr  -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
+Set-Alias rjr  -Value Remove-Jumper      -Description 'Remove record from jumper label list by label'
+Set-Alias ejr  -Value Expand-JumperLinks -Description 'Expand path variables and evaluate expressions in values of jumper links'
+Set-Alias sjr  -Value Set-Jumper         -Description ''
