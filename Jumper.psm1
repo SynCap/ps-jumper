@@ -120,6 +120,17 @@ function Add-Jumper  {
 function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
 function Clear-Jumper {$Global:Jumper.Clear()}
 
+function Save-JumperList {
+    Param (
+        $Path = (Join-Path $DataDir 'jumper.json')
+    )
+    if ($Path -notmatch '\\') {$Path = Join-Path $DataDir $Path }
+    if ($Path -notmatch '\.') {$Path += '.json' }
+
+    Write-Verbose $Path
+    ConvertTo-Json $Global:Jumper | Set-Content -Path $Path
+}
+
 Set-Alias Get-JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~   -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
