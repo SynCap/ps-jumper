@@ -47,22 +47,6 @@ function Resolve-JumperLinks {
     }
 }
 
-# function Expand-JumperLinks {
-#     $Res = @{}
-#     foreach ($Item in $Global:Jumper.GetEnumerator()) {
-#         println $Item.Name,"`t= `e[91m",$Item.Value,"`e[0m"
-#         if ('=' -eq $Item.Value[0]) {
-#             $Res[$Item.Name] = ( Invoke-Expression ( $Item.Value.Substring(1) ) -ErrorAction SilentlyContinue )
-#         } else {
-#             $Res[$Item.Name] = [System.Environment]::ExpandEnvironmentVariables($Item.Value)
-#         }
-#         println $Item.Name,"`t= `e[93m",$Res[$Item.Name],"`e[0m"
-#     }
-#     $Global:Jumper = $Res
-#     .hr
-#     Jumper
-# }
-
 function Read-JumperFile {
     param (
         $Path = ( Join-Path $DataDir 'jumper.json' ),
