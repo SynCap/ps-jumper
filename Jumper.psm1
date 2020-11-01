@@ -66,7 +66,9 @@ function Use-Jumper {
     )
     if ($Global:Jumper.Keys.Contains($Label)) {
         $Force = $Force -or (('' -eq $Path) -and !$Force)
-        $Target =  $Path ? (Join-Path (Expand-JumperLink $Global:Jumper[$Label]) $Path -Resolve) : (Expand-JumperLink $Global:Jumper[$Label])
+        $Target =  $Path ?
+            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
+            (Expand-JumperLink $Label)
         if ($Force -and !$AsString) {
             Set-Location $Target
         } else {
