@@ -5,7 +5,7 @@
     https://github.com/SynCap/ps-jumper
 #>
 
-$Global:Jumper = @{}
+$Global:Jumper = @{'~'='%UserProfile%'}
 $Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
@@ -26,7 +26,7 @@ function Read-JumperFile {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Global:Jumper.Clear() }
+    if (!$Append) { $Global:Jumper = @{ '~' = '%UserProfile%' } }
     $Global:Jumper += (('json' -ieq ($Path.Split('.')[-1])) ?
             ( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
             ( Get-Content $Path | Select-String | ConvertFrom-StringData ))
@@ -37,26 +37,6 @@ function Read-JumperFile {
 
 function Get-Jumper($filter) {
     $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } | Sort-Object Name
-}
-
-function Use-Jumper {
-    param (
-        [Parameter(position=0)] $Label='~',
-        [Parameter(position=1)] $Path='',
-        [Alias('f')] [Switch]   $Force=$false,
-        [Alias('s')] [Switch]   $AsString=$false
-    )
-    if ($Global:Jumper.Keys.Contains($Label)) {
-        $Force = $Force -or (('' -eq $Path) -and !$Force)
-        $Target =  $Path ?
-            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
-            (Expand-JumperLink $Label)
-        if ($Force -and !$AsString) {
-            Set-Location $Target
-        } else {
-            return $Target
-        }
-    }
 }
 
 function Set-Jumper {
@@ -104,6 +84,26 @@ function Expand-JumperLink  {
 function Resolve-JumperLinks {
     foreach ($Label in $Global:Jumper.Keys) {
         $Global:Jumper[$Label] = Expand-JumperLink $Label
+    }
+}
+
+function Use-Jumper {
+    param (
+        [Parameter(position=0)] $Label='~',
+        [Parameter(position=1)] $Path='',
+        [Alias('f')] [Switch]   $Force=$false,
+        [Alias('s')] [Switch]   $AsString=$false
+    )
+    if ($Global:Jumper.Keys.Contains($Label)) {
+        $Target =  $Path ?
+            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
+            (Expand-JumperLink $Label)
+        $Force = $Force -or (('' -eq $Path) -and !$Force)
+        if ($Force -and !$AsString) {
+            Set-Location $Target
+        } else {
+            return $Target
+        }
     }
 }
 

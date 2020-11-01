@@ -28,5 +28,7 @@
   "its"    : "D:\\JOB\\DS\\IT-School\\Dev.DS-IT-School",
   "qrn"    : "D:\\JOB\\DS\\Quran\\Dev.Quran",
   "tmpd"   : "D:\\TMP",
-  "wsa"    : "D:\\JOB\\WSA\\Dev"
+  "wsa"    : "D:\\JOB\\WSA\\Dev",
+
+  "reg/win" : "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\"
 }
