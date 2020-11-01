@@ -130,7 +130,7 @@ Set-Alias gjr  -Value Get-Jumper         -Description 'Get full or filtered jump
 Set-Alias rjr  -Value Remove-Jumper      -Description 'Remove record from jumper label list by label'
 Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
 Set-Alias rvjr -Value Expand-JumperLinks -Description 'Expand all links in list'
-Set-Alias sjr  -Value Set-Jumper         -Description ''
+Set-Alias sjr  -Value Set-Jumper         -Description 'Direct updates the Jumper Link'
 Set-Alias svjr -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
 
 # Read default Data
