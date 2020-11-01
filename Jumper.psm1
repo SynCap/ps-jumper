@@ -5,7 +5,7 @@
     https://github.com/SynCap/ps-jumper
 #>
 
-$Global:Jumper = @{}
+$Global:Jumper = @{'~'='%UserProfile%'}
 $Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
@@ -26,7 +26,7 @@ function Read-JumperFile {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Global:Jumper.Clear() }
+    if (!$Append) { $Global:Jumper = @{ '~' = '%UserProfile%' } }
     $Global:Jumper += (('json' -ieq ($Path.Split('.')[-1])) ?
             ( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
             ( Get-Content $Path | Select-String | ConvertFrom-StringData ))
@@ -95,10 +95,10 @@ function Use-Jumper {
         [Alias('s')] [Switch]   $AsString=$false
     )
     if ($Global:Jumper.Keys.Contains($Label)) {
-        $Force = $Force -or (('' -eq $Path) -and !$Force)
         $Target =  $Path ?
             (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
             (Expand-JumperLink $Label)
+        $Force = $Force -or (('' -eq $Path) -and !$Force)
         if ($Force -and !$AsString) {
             Set-Location $Target
         } else {
