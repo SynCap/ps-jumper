@@ -25,12 +25,22 @@ $Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
 
+function .hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
+
 function Expand-JumperLinks {
-    $Global:Jumper.GetEnumerator() |
-        Where-Object { $_.Value[0] -eq '=' } |
-            ForEach-Object {
-                $Global:Jumper[$_.Name] = ( Invoke-Expression $_.Value.Substring(1) )
-            } -ErrorAction SilentlyContinue
+    $Res = @{}
+    foreach ($Item in $Global:Jumper.GetEnumerator()) {
+        println $Item.Name,"`t= `e[91m",$Item.Value,"`e[0m"
+        if ('=' -eq $Item.Value[0]) {
+            $Res[$Item.Name] = ( Invoke-Expression ( $Item.Value.Substring(1) ) -ErrorAction SilentlyContinue )
+        } else {
+            $Res[$Item.Name] = [System.Environment]::ExpandEnvironmentVariables($Item.Value)
+        }
+        println $Item.Name,"`t= `e[93m",$Res[$Item.Name],"`e[0m"
+    }
+    $Global:Jumper = $Res
+    .hr
+    Jumper
 }
 
 function Set-Jumper {
