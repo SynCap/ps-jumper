@@ -48,18 +48,20 @@ function Read-JumperFile {
         $Path = ( Join-Path $DataDir 'jumper.json' ),
         [Alias('a')] [Switch] $Append
     )
+    if (Test-Path (Join-Path $DataDir $Path)) {
+        $Path = Join-Path $DataDir $Path
+    }
     if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
     if (!$Append) { $Global:Jumper.Clear() }
-    $Global:Jumper = (
-        ('json' -ieq ($Path.Split('.')[-1])) ?
-            ( Get-Content $Path -Verbose | ConvertFrom-Json -AsHashtable ) :
-            ( Get-Content $Path | ConvertFrom-StringData )
-    )
+    $Global:Jumper = ('json' -ieq ($Path.Split('.')[-1])) ?
+            $( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
+            $( Get-Content $Path | ConvertFrom-StringData )
     # if ($Global:Jumper.Count) { Expand-JumperLinks }
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
+    $Global:Jumper
 }
 
 function Get-Jumper($filter) {
