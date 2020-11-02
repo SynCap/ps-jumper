@@ -5,7 +5,7 @@
     https://github.com/SynCap/ps-jumper
 #>
 
-$Global:Jumper = @{'~'='%UserProfile%'}
+$Global:Jumper = @{'~'=$Env:UserProfile}
 $Global:J = $Global:Jumper;
 
 $DataDir = Join-Path $PSScriptRoot 'data'
@@ -21,12 +21,14 @@ function Read-JumperFile {
         $Path = $tp
     } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.json")) {
         $Path = $tp
+    } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.ini")) {
+        $Path = $tp
     }
     if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Global:Jumper = @{ '~' = '%UserProfile%' } }
+    if (!$Append) { $Global:Jumper = @{ '~' = $Env:UserProfile } }
     $Global:Jumper += (('json' -ieq ($Path.Split('.')[-1])) ?
             ( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
             ( Get-Content $Path | Select-String | ConvertFrom-StringData ))
@@ -36,7 +38,7 @@ function Read-JumperFile {
 }
 
 function Get-Jumper($filter) {
-    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } |
+    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } |
         %{
             [PSCustomObject]@{ 'Label'= $_.Name; 'Link'= $_.Value; 'Target'= Expand-JumperLink $_.Name }
         } | Sort-Object Label
