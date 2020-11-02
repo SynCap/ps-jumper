@@ -38,7 +38,7 @@ function Read-JumperFile {
 }
 
 function Get-Jumper($filter) {
-    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name, $_.Value -imatch $filter } |
+    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } |
         %{
             [PSCustomObject]@{ 'Label'= $_.Name; 'Link'= $_.Value; 'Target'= Expand-JumperLink $_.Name }
         } | Sort-Object Label
