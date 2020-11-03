@@ -5,6 +5,9 @@
     https://github.com/SynCap/ps-jumper
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'Jumper')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', '?')]
+
 $Script:Jumper = @{}
 $Script:JumperHistory = @()
 
@@ -48,7 +51,7 @@ function Get-Jumper($filter) {
         } | Sort-Object Label
 }
 
-function Set-Jumper {
+function Set-JumperLink {
     param(
         [Parameter(mandatory,position=0)]                   $Label,
         [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
@@ -64,7 +67,7 @@ function Add-Jumper  {
     $Script:Jumper.Add($Label, $Path)
 }
 
-function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
+function Disable-JumperLink ($Label) { $Script:Jumper.Remove($Label) }
 function Clear-Jumper {$Script:Jumper.Clear()}
 
 function Save-JumperList {
@@ -92,9 +95,9 @@ function Expand-JumperLink  {
     }
 }
 
-function Resolve-JumperLinks {
-    foreach ($Label in $Global:Jumper.Keys) {
-        $Global:Jumper[$Label] = Expand-JumperLink $Label
+function Resolve-JumperList {
+    foreach ($Label in $Script:Jumper.Keys) {
+        $Script:Jumper[$Label] = Expand-JumperLink $Label
     }
 }
 
@@ -139,16 +142,16 @@ function Use-Jumper {
 
 Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
-Set-Alias  ~   -Value Use-Jumper          -Description 'Jump to target using label and added path or get the resolved path'
-Set-Alias ajr  -Value Add-Jumper          -Description 'Add label to jumper list'
-Set-Alias rdjr -Value Read-JumperFile     -Description 'Set or enhance jumper label list from JSON or text (INI) file'
-Set-Alias cjr  -Value Clear-Jumper        -Description 'Clear jumper label list'
-Set-Alias gjr  -Value Get-Jumper          -Description 'Get full or filtered jumper link list'
-Set-Alias rjr  -Value Remove-Jumper       -Description 'Remove record from jumper label list by label'
-Set-Alias ejr  -Value Expand-JumperLink   -Description 'Expand path variables and evaluate expressions in value of jumper link'
-Set-Alias rvjr -Value Resolve-JumperLinks -Description 'Expand all links in list'
-Set-Alias sjr  -Value Set-Jumper          -Description 'Direct updates the Jumper Link'
-Set-Alias svjr -Value Save-JumperList     -Description 'Save current Jumper Links List to the file'
+Set-Alias  ~   -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
+Set-Alias ajr  -Value Add-Jumper         -Description 'Add label to jumper list'
+Set-Alias rdjr -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
+Set-Alias cjr  -Value Clear-Jumper       -Description 'Clear jumper label list'
+Set-Alias gjr  -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
+Set-Alias djr  -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
+Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
+Set-Alias rvjr -Value Resolve-JumperList -Description 'Expand all links in list'
+Set-Alias sjr  -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
+Set-Alias svjr -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
 
 # Read default Data
 rdjr jumper.json
