@@ -87,7 +87,7 @@ function Expand-JumperLink  {
         $Label
     )
     Process {
-        if ('=' -eq $Script:Jumper[$Label][0]) {
+        if ($Label -and '=' -eq $Script:Jumper[$Label][0]) {
             ( Invoke-Expression ( $Script:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
         } else {
             [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label])
@@ -133,7 +133,6 @@ function Use-Jumper {
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
         $Script:JumperHistory += "$PWD"
-        Write-Debug $Script:JumperHistory
         Set-Location $Target
     } else {
         return $Target
