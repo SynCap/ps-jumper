@@ -5,8 +5,8 @@
     https://github.com/SynCap/ps-jumper
 #>
 
-$Global:Jumper = @{'~'=$Env:UserProfile}
-$Global:J = $Global:Jumper;
+$Script:Jumper = @{}
+$Script:JumperHistory = @()
 
 $DataDir = Join-Path $PSScriptRoot 'data'
 
@@ -28,17 +28,21 @@ function Read-JumperFile {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Global:Jumper = @{ '~' = $Env:UserProfile } }
-    $Global:Jumper += (('json' -ieq ($Path.Split('.')[-1])) ?
-            ( Get-Content $Path | ConvertFrom-Json -AsHashtable ) :
-            ( Get-Content $Path | Select-String | ConvertFrom-StringData ))
-    # if ($Global:Jumper.Count) { Expand-JumperLinks }
-    Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Global:Jumper.Count )
-    $Global:Jumper
+    if (!$Append) { $Script:Jumper = @{} }
+    $ErrorActionPreference = 'SilentlyContinue';
+    $Script:Jumper += (
+        ('json' -ieq ($Path.Split('.')[-1]))?
+        ( Get-Content $Path | ConvertFrom-Json -AsHashtable):
+        ( Get-Content $Path | Select-String | ConvertFrom-StringData)
+    )
+    $ErrorActionPreference = 'Continue';
+    # if ($Script:Jumper.Count) { Expand-JumperLink }
+    Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
+    $Script:Jumper
 }
 
 function Get-Jumper($filter) {
-    $Global:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } |
+    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } |
         %{
             [PSCustomObject]@{ 'Label'= $_.Name; 'Link'= $_.Value; 'Target'= Expand-JumperLink $_.Name }
         } | Sort-Object Label
@@ -49,7 +53,7 @@ function Set-Jumper {
         [Parameter(mandatory,position=0)]                   $Label,
         [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
     )
-    $Global:Jumper.SetValue($Label, $Path)
+    $Script:Jumper[$Label] = $Path
 }
 
 function Add-Jumper  {
@@ -57,11 +61,11 @@ function Add-Jumper  {
         [Parameter(mandatory,position=0)]                   $Label,
         [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
     )
-    $Global:Jumper.Add($Label, $Path)
+    $Script:Jumper.Add($Label, $Path)
 }
 
 function Remove-Jumper ($Label) { $Global:Jumper.Remove($Label) }
-function Clear-Jumper {$Global:Jumper.Clear()}
+function Clear-Jumper {$Script:Jumper.Clear()}
 
 function Save-JumperList {
     Param (
@@ -71,7 +75,7 @@ function Save-JumperList {
     if ($Path -notmatch '\.') {$Path += '.json' }
 
     Write-Verbose $Path
-    ConvertTo-Json $Global:Jumper | Set-Content -Path $Path
+    ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
 }
 
 function Expand-JumperLink  {
@@ -79,10 +83,12 @@ function Expand-JumperLink  {
         [Parameter(Mandatory,ValueFromPipeline,Position=0)]
         $Label
     )
-    if ('=' -eq $Global:Jumper[$Label][0]) {
-        ( Invoke-Expression ( $Global:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
-    } else {
-        [System.Environment]::ExpandEnvironmentVariables($Global:Jumper[$Label])
+    Process {
+        if ('=' -eq $Script:Jumper[$Label][0]) {
+            ( Invoke-Expression ( $Script:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
+        } else {
+            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label])
+        }
     }
 }
 
@@ -99,16 +105,35 @@ function Use-Jumper {
         [Alias('f')] [Switch]   $Force=$false,
         [Alias('s')] [Switch]   $AsString=$false
     )
-    if ($Global:Jumper.Keys.Contains($Label)) {
-        $Target =  $Path ?
-            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
-            (Expand-JumperLink $Label)
-        $Force = $Force -or (('' -eq $Path) -and !$Force)
-        if ($Force -and !$AsString) {
-            Set-Location $Target
-        } else {
-            return $Target
-        }
+    switch ($Label) {
+        '~' {
+                $Target = $Env:USERPROFILE;
+                break;
+            }
+        '-' {
+                if($Script:JumperHistory.Count) {
+                    $Target = $Script:JumperHistory[-1];
+                    $Script:JumperHistory[-1] = $null;
+                    break;
+                }else{
+                    Write-Warning 'Jumper history is empty';
+                    return;
+                }
+            }
+        {$Script:Jumper.Keys.Contains($Label)}
+            {
+                $Target =  $Path ?
+                    (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
+                    (Expand-JumperLink $Label)
+            }
+    }
+    $Force = $Force -or (('' -eq $Path) -and !$Force)
+    if ($Force -and !$AsString) {
+        $Script:JumperHistory += "$PWD"
+        Write-Debug $Script:JumperHistory
+        Set-Location $Target
+    } else {
+        return $Target
     }
 }
 
