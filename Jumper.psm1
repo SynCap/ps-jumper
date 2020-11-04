@@ -9,7 +9,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', '?')]
 
 $Script:Jumper = @{}
-$Script:JumperHistory = @()
+$Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 
 $DataDir = Join-Path $PSScriptRoot 'data'
 
@@ -35,10 +35,11 @@ function Read-JumperFile {
     $ErrorActionPreference = 'SilentlyContinue';
     $Script:Jumper += (
         ('json' -ieq ($Path.Split('.')[-1]))?
-        ( Get-Content $Path | ConvertFrom-Json -AsHashtable):
-        ( Get-Content $Path | Select-String | ConvertFrom-StringData)
+        ( Get-Content $Path | ConvertFrom-Json -AsHashtable -ErrorVariable ErrConvert):
+        ( Get-Content $Path | Select-String | ConvertFrom-StringData -ErrorVariable ErrConvert)
     )
     $ErrorActionPreference = 'Continue';
+    $ErrConvert  | %{println "`e[31m",$_.Exception.Message}
     # if ($Script:Jumper.Count) { Expand-JumperLink }
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
     $Script:Jumper
@@ -52,7 +53,7 @@ function Get-Jumper($filter) {
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
-    $Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )
+    ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) | Foreach-Object { println "`e[0m",$_ }
 }
 
 function Set-JumperLink {
@@ -134,8 +135,9 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
-                $JumpMessage = "`e[33m",$Label,"`e[0m - go back to `e[93m",$Target,"`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m" -join ''
-                    $Script:JumperHistory[-1] = $null;
+                    $JumpMessage = "`e[33m",$Label,"`e[0m - go back to `e[93m",$Target,
+                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m" -join ''
+                    $Script:JumperHistory.RemoveAt($Script:JumperHistory.Count -1)
                     break;
                 }else{
                     Write-Warning 'Jumper history is empty';
@@ -143,7 +145,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "`e[33m",$Label,"`e[0m - label from Jumper list `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
+                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -151,18 +153,20 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                $JumpMessage = "`e[33m",$Label,"`e[0m - label presented. Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
+                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label presented.",
+                    "Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
                 if (Test-Path $Target) {
                     break;
                 }
             }
         {Test-Path $Label} {
                 $Target = Resolve-Path $Label;
-                $JumpMessage = "`e[33m",$Label,"`e[0m - label is a real path: `e[93m",$Target,"`e[0m" -join ''
+                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label is a real path: `e[93m",$Target,"`e[0m" -join ''
                 break;
             }
         default {
-                $JumpMessage = "`e[0mProbably no correct label provided. Target will set current location: `e[93m",$PWD,"`e[0m" -join ''
+                $JumpMessage = "`e[0mProbably `e[91mno correct label`e[0m provided.`n",
+                    "Target will be set to the current location: `e[93m",$PWD,"`e[0m" -join ''
                 $Target = $PWD
             }
     }
@@ -170,7 +174,7 @@ function Use-Jumper {
     if ($Force -and !$AsString) {
         if ('-' -ne $Label){
             if ($Script:JumperHistory[-1] -ne $PWD){
-                 $Script:JumperHistory += "$PWD"
+                 $Script:JumperHistory.Add( "$PWD" )
             }
         }
         println $JumpMessage
@@ -182,17 +186,17 @@ function Use-Jumper {
 
 Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
-Set-Alias  ~   -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
-Set-Alias ajr  -Value Add-Jumper         -Description 'Add label to jumper list'
-Set-Alias rdjr -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
-Set-Alias cjr  -Value Clear-Jumper       -Description 'Clear jumper label list'
-Set-Alias gjr  -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
-Set-Alias djr  -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
-Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
-Set-Alias rvjr -Value Resolve-JumperList -Description 'Expand all links in list'
-Set-Alias sjr  -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
-Set-Alias svjr -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
-Set-Alias shjrh -Value Show-JumperListHistory    -Description 'Just show saved history of jumps'
+Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
+Set-Alias ajr   -Value Add-Jumper         -Description 'Add label to jumper list'
+Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
+Set-Alias cjr   -Value Clear-Jumper       -Description 'Clear jumper label list'
+Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
+Set-Alias djr   -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
+Set-Alias ejr   -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
+Set-Alias rvjr  -Value Resolve-JumperList -Description 'Expand all links in list'
+Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
+Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
+Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 
 # Read default Data
-rdjr jumper.json
+Read-JumperFile jumper.json
