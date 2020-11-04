@@ -144,7 +144,7 @@ function Use-Jumper {
                     (Expand-JumperLink $Label)
                 break;
             }
-        {$Label} {
+        {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
                 println "Label ``$Label`` still exists. Found shell folder for it: `e[97m", $Target
                 if (Test-Path $Target) {
