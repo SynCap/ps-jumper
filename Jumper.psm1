@@ -137,11 +137,19 @@ function Use-Jumper {
                     return;
                 }
             }
-        {$Script:Jumper.Keys.Contains($Label)}
-            {
+        {Test-Path $Label} {
+                $Target = $Label;
+                break;
+            }
+        {$Script:Jumper.Keys.Contains($Label)} {
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
+                break;
+            }
+        {!$Label -or !(Test-Path ($Target = spf $Label))} {
+                $Target = '.'
+                break;
             }
     }
     $Force = $Force -or (('' -eq $Path) -and !$Force)
