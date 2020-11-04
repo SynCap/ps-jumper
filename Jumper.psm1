@@ -145,7 +145,9 @@ function Use-Jumper {
     }
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
-        $Script:JumperHistory += "$PWD"
+        if ('-' -ne $Label){
+             $Script:JumperHistory += "$PWD"
+        }
         Set-Location $Target
     } else {
         return $Target
