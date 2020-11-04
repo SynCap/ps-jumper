@@ -51,13 +51,14 @@ function Read-JumperFile {
         return
     }
     if (!$Append) { $Script:Jumper.Clear() }
-
+    $Conflicts = [System.Collections.Generic.List[string]]::new()
     if ('json' -ieq ($Path.Split('.')[-1])) {
-        $Script:Jumper += ( Get-Content $Path | ConvertFrom-Json -AsHashtable )
+        ( Get-Content $Path | ConvertFrom-Json -AsHashtable ).GetEnumerator() | Foreach-Object {
+            $Script:Jumper.Add($_.Name, $_.Value)
+        }
     } else {
         Get-Content $Path | ConvertFrom-StringData | Foreach-Object { $Script:Jumper += $_}
     }
-
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
 }
 
