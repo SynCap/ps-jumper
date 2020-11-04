@@ -5,15 +5,34 @@
     https://github.com/SynCap/ps-jumper
 #>
 
+############################# CodeAnalysis
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'Jumper')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', '?')]
 
+############################# Data
 $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-
 $DataDir = Join-Path $PSScriptRoot 'data'
 
-function .hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
+############################# Helper functions
+function local:hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
+function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::Write($Params -join '')}
+function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::WriteLine($Params -join '')}
+
+function local:spf ([parameter(ValueFromPipeline,position=0)][string] $ShFName) {
+    try {
+        [Environment]::GetFolderPath($ShFName)
+    } catch {
+        $ShFName
+    }
+}
+
+function local:exps ([parameter(ValueFromPipeline)][string]$s) {
+    $re = '#\(\s*(\w+?)\s*\)'
+    $s -replace $re, { $_.Groups[1].Value | spf }
+}
+
+############################# Module Core
 
 function Read-JumperFile {
     param (
@@ -53,7 +72,12 @@ function Get-Jumper($filter) {
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
-    ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) | Foreach-Object { println "`e[0m",$_ }
+    if ($Script:JumperHistory.Count) { hr } else {  "`e[33mNo Jumper history yet`e[0m"; return;  }
+    ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
+        Foreach-Object -Begin{$Index=1} -Process {
+            println "`e[32m",$Index,". `e[0m",$_
+            $index++
+        }
 }
 
 function Set-JumperLink {
@@ -84,19 +108,6 @@ function Save-JumperList {
 
     Write-Verbose $Path
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
-}
-
-function local:spf ([parameter(ValueFromPipeline,position=0)][string] $ShFName) {
-    try {
-        [Environment]::GetFolderPath($ShFName)
-    } catch {
-        $ShFName
-    }
-}
-
-function local:exps ([parameter(ValueFromPipeline)][string]$s) {
-    $re = '#\(\s*(\w+?)\s*\)'
-    $s -replace $re, { $_.Groups[1].Value | spf }
 }
 
 function Expand-JumperLink  {
@@ -184,6 +195,8 @@ function Use-Jumper {
     }
 }
 
+############################# Module specific Aliases
+
 Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
@@ -198,5 +211,5 @@ Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumpe
 Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
 Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 
-# Read default Data
+############################## Initialisation, Read default Data
 Read-JumperFile jumper.json
