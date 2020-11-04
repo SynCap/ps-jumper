@@ -81,11 +81,11 @@ function Save-JumperList {
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
 }
 
-function local:spf ([parameter(ValueFromPipeline)][string]$SpFldrName) {
+function local:spf ([parameter(ValueFromPipeline,position=0)][string] $ShFName) {
     try {
-        [Environment]::GetFolderPath($SpFldrName)
+        [Environment]::GetFolderPath($ShFName)
     } catch {
-        $SpFldrName
+        $ShFName
     }
 }
 
@@ -121,6 +121,7 @@ function Use-Jumper {
         [Alias('f')] [Switch]   $Force=$false,
         [Alias('s')] [Switch]   $AsString=$false
     )
+
     switch ($Label) {
         '~' {
                 $Target = $Env:USERPROFILE;
