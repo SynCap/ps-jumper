@@ -18,6 +18,7 @@
   "wp"     : "#(MyPictures)\\WP",
   "wp/b"   : "#(MyPictures)\\WP\\Bing",
 
+  ".net"   : "%JOB\\DotNet",
   "cli"    : "%CLI%",
   "closk"  : "%JOB%\\CLosk.Work\\Dev._default",
   "cls"    : "%JOB%\\CLosk.Work\\Dev._default",
@@ -35,5 +36,6 @@
   "ps/s"   : "%JOB%\\PowerShell\\Scripts",
   "qrn"    : "%JOB%\\DS\\Quran\\Dev.Quran",
   "tmpd"   : "D:\\TMP",
+  "vue"    : "%JOB%\\JS\\Vue",
   "wsa"    : "%JOB%\\WSA\\Dev"
 }
