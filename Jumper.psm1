@@ -51,6 +51,10 @@ function Get-Jumper($filter) {
         } | Sort-Object Label
 }
 
+function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
+    $Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )
+}
+
 function Set-JumperLink {
     param(
         [Parameter(mandatory,position=0)]                   $Label,
@@ -188,6 +192,7 @@ Set-Alias ejr  -Value Expand-JumperLink  -Description 'Expand path variables and
 Set-Alias rvjr -Value Resolve-JumperList -Description 'Expand all links in list'
 Set-Alias sjr  -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
 Set-Alias svjr -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
+Set-Alias shjrh -Value Show-JumperListHistory    -Description 'Just show saved history of jumps'
 
 # Read default Data
 rdjr jumper.json
