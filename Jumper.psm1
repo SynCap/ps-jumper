@@ -81,11 +81,11 @@ function Save-JumperList {
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
 }
 
-function local:spf ([parameter(ValueFromPipeline)][string]$SpFldrName) {
+function local:spf ([parameter(ValueFromPipeline,position=0)][string] $ShFName) {
     try {
-        [Environment]::GetFolderPath($SpFldrName)
+        [Environment]::GetFolderPath($ShFName)
     } catch {
-        $SpFldrName
+        $ShFName
     }
 }
 
@@ -121,6 +121,7 @@ function Use-Jumper {
         [Alias('f')] [Switch]   $Force=$false,
         [Alias('s')] [Switch]   $AsString=$false
     )
+
     switch ($Label) {
         '~' {
                 $Target = $Env:USERPROFILE;
@@ -136,17 +137,36 @@ function Use-Jumper {
                     return;
                 }
             }
-        {$Script:Jumper.Keys.Contains($Label)}
-            {
+        {[bool]$Script:Jumper[$Label]} {
+                println "Label ``$Label`` from Jumper list `e[93m",$Script:Jumper[$Label]
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
+                break;
+            }
+        {$Label} {
+                $Target = spf $Label;
+                println "Label ``$Label`` still exists. Found shell folder for it: `e[97m", $Target
+                if (Test-Path $Target) {
+                    break;
+                }
+            }
+        {Test-Path $Label} {
+                println "Label is a real path"
+                $Target = $Label;
+                break;
+            }
+        default {
+                println "Default action. Probably no label provided"
+                $Target = $PWD
             }
     }
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
         if ('-' -ne $Label){
-             $Script:JumperHistory += "$PWD"
+            if ($Script:JumperHistory[-1] -ne $PWD){
+                 $Script:JumperHistory += "$PWD"
+            }
         }
         Set-Location $Target
     } else {
