@@ -12,7 +12,7 @@
 ############################# Data
 $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-$DataDir = Join-Path $PSScriptRoot 'data'
+$Script:DataDir = Join-Path $PSScriptRoot 'data'
 
 ############################# Helper functions
 function local:hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
@@ -36,39 +36,37 @@ function local:exps ([parameter(ValueFromPipeline)][string]$s) {
 
 function Read-JumperFile {
     param (
-        $Path = ( Join-Path $DataDir 'jumper.json' ),
+        $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
         [Alias('a')] [Switch] $Append
     )
-    if (Test-Path ($tp = Join-Path $DataDir $Path)) {
+    if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.json")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $DataDir "$Path.ini")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.ini")) {
         $Path = $tp
     }
     if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Script:Jumper = @{} }
-    $ErrorActionPreference = 'SilentlyContinue';
-    $Script:Jumper += (
-        ('json' -ieq ($Path.Split('.')[-1]))?
-        ( Get-Content $Path | ConvertFrom-Json -AsHashtable -ErrorVariable ErrConvert):
-        ( Get-Content $Path | Select-String | ConvertFrom-StringData -ErrorVariable ErrConvert)
-    )
-    $ErrorActionPreference = 'Continue';
-    $ErrConvert  | %{println "`e[31m",$_.Exception.Message}
-    # if ($Script:Jumper.Count) { Expand-JumperLink }
+    if (!$Append) { $Script:Jumper.Clear() }
+
+    if ('json' -ieq ($Path.Split('.')[-1])) {
+        $Script:Jumper += ( Get-Content $Path | ConvertFrom-Json -AsHashtable )
+    } else {
+        Get-Content $Path | ConvertFrom-StringData | Foreach-Object { $Script:Jumper += $_}
+    }
+
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
-    $Script:Jumper
 }
 
 function Get-Jumper($filter) {
-    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } |
-        %{
-            [PSCustomObject]@{ 'Label'= $_.Name; 'Link'= $_.Value; 'Target'= Expand-JumperLink $_.Name }
-        } | Sort-Object Label
+    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
+        Foreach-Object -Begin {$SNo=1} -Process {
+            [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)`e[0m"; 'Target'= Expand-JumperLink $_.Name }
+            $SNo++
+        }
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
@@ -101,9 +99,9 @@ function Clear-Jumper {$Script:Jumper.Clear()}
 
 function Save-JumperList {
     Param (
-        $Path = (Join-Path $DataDir 'jumper.json')
+        $Path = (Join-Path $Script:DataDir 'jumper.json')
     )
-    if ($Path -notmatch '\\') {$Path = Join-Path $DataDir $Path }
+    if ($Path -notmatch '\\') {$Path = Join-Path $Script:DataDir $Path }
     if ($Path -notmatch '\.') {$Path += '.json' }
 
     Write-Verbose $Path
@@ -156,7 +154,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
+                $JumpMessage = "Label `e[1;33m",$Label,"`e[0m from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
