@@ -100,8 +100,8 @@ function Expand-JumperLink  {
         $Label
     )
     Process {
-        if ($Label -and '=' -eq $Script:Jumper[$Label][0]) {
-            ( Invoke-Expression ( $Script:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
+        if ($Label -in $Script:Jumper.Keys -and '=' -eq $Script:Jumper[$Label][0]) {
+            Invoke-Expression $Script:Jumper[$Label].Substring(1)
         } else {
             [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label]) | exps
         }
