@@ -81,16 +81,29 @@ function Save-JumperList {
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
 }
 
+function local:spf ([parameter(ValueFromPipeline)][string]$SpFldrName) {
+    try {
+        [Environment]::GetFolderPath($SpFldrName)
+    } catch {
+        $SpFldrName
+    }
+}
+
+function local:exps ([parameter(ValueFromPipeline)][string]$s) {
+    $re = '#\(\s*(\w+?)\s*\)'
+    $s -replace $re, { $_.Groups[1].Value | spf }
+}
+
 function Expand-JumperLink  {
     param (
         [Parameter(Mandatory,ValueFromPipeline,Position=0)]
         $Label
     )
     Process {
-        if ($Label -and '=' -eq $Script:Jumper[$Label][0]) {
-            ( Invoke-Expression ( $Script:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
+        if ($Label -in $Script:Jumper.Keys -and '=' -eq $Script:Jumper[$Label][0]) {
+            Invoke-Expression $Script:Jumper[$Label].Substring(1)
         } else {
-            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label])
+            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label]) | exps
         }
     }
 }
@@ -132,7 +145,9 @@ function Use-Jumper {
     }
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
-        $Script:JumperHistory += "$PWD"
+        if ('-' -ne $Label){
+             $Script:JumperHistory += "$PWD"
+        }
         Set-Location $Target
     } else {
         return $Target
