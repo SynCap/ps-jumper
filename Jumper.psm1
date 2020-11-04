@@ -81,6 +81,19 @@ function Save-JumperList {
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
 }
 
+function local:spf ([parameter(ValueFromPipeline)][string]$SpFldrName) {
+    try {
+        [Environment]::GetFolderPath($SpFldrName)
+    } catch {
+        $SpFldrName
+    }
+}
+
+function local:exps ([parameter(ValueFromPipeline)][string]$s) {
+    $re = '#\(\s*(\w+?)\s*\)'
+    $s -replace $re, { $_.Groups[1].Value | spf }
+}
+
 function Expand-JumperLink  {
     param (
         [Parameter(Mandatory,ValueFromPipeline,Position=0)]
@@ -90,7 +103,7 @@ function Expand-JumperLink  {
         if ($Label -and '=' -eq $Script:Jumper[$Label][0]) {
             ( Invoke-Expression ( $Script:Jumper[$Label].Substring(1) ) -ErrorAction SilentlyContinue )
         } else {
-            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label])
+            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label]) | exps
         }
     }
 }
