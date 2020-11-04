@@ -144,8 +144,8 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
-                    $JumpMessage = "`e[33m",$Label,"`e[0m - go back to `e[93m",$Target,
-                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m" -join ''
+                    $JumpMessage = "`e[0m Go back to `e[93m",$Target,
+                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m"
                     $Script:JumperHistory.RemoveAt($Script:JumperHistory.Count -1)
                     break;
                 }else{
@@ -154,7 +154,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "Label `e[1;33m",$Label,"`e[0m from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
+                $JumpMessage = "Label `e[1;33m",$Label,"`e[0m from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m"
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -162,7 +162,7 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label presented.",
+                $JumpMessage = "`e[0m Label `e[1;33m",$Label,"`e[0m presented.",
                     "Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
                 if (Test-Path $Target) {
                     break;
@@ -170,12 +170,12 @@ function Use-Jumper {
             }
         {Test-Path $Label} {
                 $Target = Resolve-Path $Label;
-                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label is a real path: `e[93m",$Target,"`e[0m" -join ''
+                $JumpMessage = "`e[0m Label `e[1;33m",$Label," is a real path: `e[93m",$Target,"`e[0m"
                 break;
             }
         default {
                 $JumpMessage = "`e[0mProbably `e[91mno correct label`e[0m provided.`n",
-                    "Target will be set to the current location: `e[93m",$PWD,"`e[0m" -join ''
+                    "Target will be set to the current location: `e[93m",$PWD,"`e[0m"
                 $Target = $PWD
             }
     }
