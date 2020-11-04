@@ -137,19 +137,28 @@ function Use-Jumper {
                     return;
                 }
             }
-        {Test-Path $Label} {
-                $Target = $Label;
-                break;
-            }
-        {$Script:Jumper.Keys.Contains($Label)} {
+        {[bool]$Script:Jumper[$Label]} {
+                println "Label ``$Label`` from Jumper list `e[93m",$Script:Jumper[$Label]
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
                 break;
             }
-        {!$Label -or !(Test-Path ($Target = spf $Label))} {
-                $Target = '.'
+        {$Label} {
+                $Target = spf $Label;
+                println "Label ``$Label`` still exists. Found shell folder for it: `e[97m", $Target
+                if (Test-Path $Target) {
+                    break;
+                }
+            }
+        {Test-Path $Label} {
+                println "Label is a real path"
+                $Target = $Label;
                 break;
+            }
+        default {
+                println "Default action. Probably no label provided"
+                $Target = $PWD
             }
     }
     $Force = $Force -or (('' -eq $Path) -and !$Force)
