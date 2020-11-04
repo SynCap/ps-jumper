@@ -130,6 +130,7 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
+                $JumpMessage = "`e[33m",$Label,"`e[0m - go back to `e[93m",$Target,"`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m" -join ''
                     $Script:JumperHistory[-1] = $null;
                     break;
                 }else{
@@ -138,7 +139,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                println "Label ``$Label`` from Jumper list `e[93m",$Script:Jumper[$Label]
+                $JumpMessage = "`e[33m",$Label,"`e[0m - label from Jumper list `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -146,18 +147,18 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                println "Label ``$Label`` still exists. Found shell folder for it: `e[97m", $Target
+                $JumpMessage = "`e[33m",$Label,"`e[0m - label presented. Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
                 if (Test-Path $Target) {
                     break;
                 }
             }
         {Test-Path $Label} {
-                println "Label is a real path"
-                $Target = $Label;
+                $Target = Resolve-Path $Label;
+                $JumpMessage = "`e[33m",$Label,"`e[0m - label is a real path: `e[93m",$Target,"`e[0m" -join ''
                 break;
             }
         default {
-                println "Default action. Probably no label provided"
+                $JumpMessage = "`e[0mProbably no correct label provided. Target will set current location: `e[93m",$PWD,"`e[0m" -join ''
                 $Target = $PWD
             }
     }
@@ -168,6 +169,7 @@ function Use-Jumper {
                  $Script:JumperHistory += "$PWD"
             }
         }
+        println $JumpMessage
         Set-Location $Target
     } else {
         return $Target
