@@ -144,7 +144,7 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
-                    $JumpMessage = "`e[0m Go back to `e[93m",$Target,
+                    $JumpMessage = "`e[0m Go back to `e[33m",$Target,
                         "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m"
                     $Script:JumperHistory.RemoveAt($Script:JumperHistory.Count -1)
                     break;
@@ -154,7 +154,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "Label `e[1;33m",$Label,"`e[0m from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m"
+                $JumpMessage = "Label `e[33m",$Label,"`e[0m from Jumper list: `e[33m",$Script:Jumper[$Label],"`e[0m"
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -162,20 +162,20 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                $JumpMessage = "`e[0m Label `e[1;33m",$Label,"`e[0m presented.",
-                    "Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
+                $JumpMessage = "`e[0m Label `e[33m",$Label,"`e[0m presented.",
+                    "Found shell folder for it: `e[33m", $Target,"`e[0m" -join ''
                 if (Test-Path $Target) {
                     break;
                 }
             }
         {Test-Path $Label} {
                 $Target = Resolve-Path $Label;
-                $JumpMessage = "`e[0m Label `e[1;33m",$Label," is a real path: `e[93m",$Target,"`e[0m"
+                $JumpMessage = "`e[0m Label `e[33m",$Label," is a real path: `e[93m",$Target,"`e[0m"
                 break;
             }
         default {
                 $JumpMessage = "`e[0mProbably `e[91mno correct label`e[0m provided.`n",
-                    "Target will be set to the current location: `e[93m",$PWD,"`e[0m"
+                    "Target will be set to the current location: `e[33m",$PWD,"`e[0m"
                 $Target = $PWD
             }
     }
