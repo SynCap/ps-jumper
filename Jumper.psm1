@@ -100,9 +100,7 @@
 
 #>
 
-############################# CodeAnalysis
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'Jumper')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', '?')]
+############################# Code Analysis Suppress Rules
 
 ############################# Data
 $Script:Jumper = @{}
