@@ -337,5 +337,7 @@ Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumpe
 Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
 Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 
+Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
+
 ############################## Initialisation, Read default Data
 Read-JumperFile jumper.json
