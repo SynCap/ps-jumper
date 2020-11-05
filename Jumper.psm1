@@ -155,7 +155,7 @@ function Read-JumperFile {
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
 }
 
-function Get-Jumper($filter) {
+function Get-Jumper($Filter,[Alias('w')][switch]$Wide) {
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
         Foreach-Object -Begin {$SNo=1} -Process {
             [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)`e[0m"; 'Target'= Expand-JumperLink $_.Name }
