@@ -108,7 +108,7 @@ $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:DataDir = Join-Path $PSScriptRoot 'data'
 
 ############################# Helper functions
-function local:hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
+function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
 function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::Write($Params -join '')}
 function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::WriteLine($Params -join '')}
 
