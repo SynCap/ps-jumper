@@ -338,6 +338,7 @@ Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Link
 Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 
 Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
+Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already poor 😥'
 
 ############################## Initialisation, Read default Data
 Read-JumperFile jumper.json
