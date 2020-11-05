@@ -3,8 +3,10 @@
   "temp" : "%TEMP%",
   "tmp"  : "%TEMP%",
 
-  "appd" : "=$env:APPDATA",
-  "ps/h" : "=(Get-ChildItem $PROFILE).DirectoryName",
+  "appd"  : "=$env:APPDATA",
+  "ps/h"  : "=Split-Path $Profile",
+  "ps/hm" : "=Join-Path (Split-Path $Profile) Modules",
+  "ps/hs" : "=Join-Path (Split-Path $Profile) Scripts",
 
   "arts"   : "#(MyPictures)\\Arts",
   "cnf"    : "#(Personal)\\Conf",
@@ -30,8 +32,8 @@
   "its"    : "%JOB%\\DS\\IT-School\\Dev.DS-IT-School",
   "j"      : "%JOB%\\PowerShell\\Modules\\Jumper",
   "j/d"    : "%JOB%\\PowerShell\\Modules\\Jumper\\Data",
+  "ps"     : "%JOB%\\PowerShell",
   "ps/c"   : "%JOB%\\PowerShell\\Common",
-  "ps/d"   : "%JOB%\\PowerShell",
   "ps/m"   : "%JOB%\\PowerShell\\Modules",
   "ps/s"   : "%JOB%\\PowerShell\\Scripts",
   "qrn"    : "%JOB%\\DS\\Quran\\Dev.Quran",
