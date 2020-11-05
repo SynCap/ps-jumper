@@ -299,6 +299,28 @@ function Restart-JumperModule {
     Import-Module $ModuleName -Force -Verbose:($Args.Verbose)
 }
 
+function Invoke-JumperCommand {
+    param(
+        [Parameter(position=0)] [String] $Command='Help'
+    )
+    "Command to execute: ", $Command
+
+    switch ($Command) {
+        {$_ -in ('a','add')}      {add-jumper $args; break}
+        {$_ -in ('rd','read')}    {Read-JumperFile $args;    break}
+        {$_ -in ('c','clear')}    {Clear-Jumper;             break}
+        {$_ -in ('g','get')}      {Get-Jumper $args;         break}
+        {$_ -in ('d','disable')}  {Disable-JumperLink $args; break}
+        {$_ -in ('e','expand')}   {Expand-JumperLink $args;  break}
+        {$_ -in ('rv','resolve')} {Resolve-JumperList;       break}
+        {$_ -in ('s','set')}      {Set-JumperLink $args;     break}
+        {$_ -in ('sv','save')}    {Save-JumperList $args;    break}
+        {$_ -in ('history')}      {Show-JumperHistory $args; break}
+        {$_ -in ('rt','restart')} {Restart-JumperModule;     break}
+        {$_ -in ('h','Help')}     {Get-Help ($PSScriptRoot)}
+    }
+}
+
 ############################# Module specific Aliases
 
 Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
