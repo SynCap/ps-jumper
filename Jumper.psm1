@@ -280,7 +280,7 @@ function Use-Jumper {
                  $Script:JumperHistory.Add( "$PWD" )
             }
         }
-        println $JumpMessage
+        if ($Verbose){println $JumpMessage}
         Set-Location $Target
     } else {
         return $Target
