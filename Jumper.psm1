@@ -287,6 +287,18 @@ function Use-Jumper {
     }
 }
 
+function Restart-JumperModule {
+    $Verbose = $Args.Verbose
+    println "Verbose: ", $Verbose
+    println "ARGS Count ", $Args.Count
+    hr
+    $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
+    Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
+    Remove-Module $ModuleName -Force -Verbose:($Args.Verbose)
+    Write-Verbose "JUMPER: try to LOAD $ModuleName ($PSScriptRoot)"
+    Import-Module $ModuleName -Force -Verbose:($Args.Verbose)
+}
+
 ############################# Module specific Aliases
 
 Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
