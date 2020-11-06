@@ -1,13 +1,114 @@
+#!/usr/bin/env pwsh
 <#
-    Jumper
-    PowerShell Console filesystem folders quick links.
-    (c)CLosk, 2020
-    https://github.com/SynCap/ps-jumper
+    .Synopsis
+
+        Jumper
+        PowerShell Console filesystem folders quick links.
+        (c)CLosk, 2020
+        https://github.com/SynCap/ps-jumper
+
+    .Description
+
+        # PS Jumper
+
+            Module to provide folders' shortcuts in PowerShell console - quick jumps by labels - the aliases of the target.
+
+        ## Features
+
+            - Links stored in JSON and/or INI files;
+            - Target of links can contain environment variables;
+            - Target of links can contain native PowerShell expressions evaluated at call time;
+            - Lists of links can be combined from several files
+            - Automatic expansions of links with shortcuts of shell folders
+            - History of locations only in addition to yours' CLI history
+
+        ## Sample link list file (INI format):
+
+            ```PowerShell
+            appd = =$env:APPDATA # PS expression that returns value of env variable
+
+            pfl = =(Get-ChildItem $PROFILE).DirectoryName # PS expressions that returns
+            psh = =(Get-ChildItem $PROFILE).DirectoryName # path string
+
+            pgfl = %ProgramFiles% # Targets can contains common legacy env vars
+            temp = %Temp%         # Env vars evaluates at call time
+
+            # Ordinal link can contain plain target path
+            jmpr     = D:\\JOB\\PowerShell\\Modules\\Jumper\\
+
+            # Label name can contain some non word symbols
+            jmpr/d   = D:\\JOB\\PowerShell\\Modules\\Jumper\\data
+
+            # even blank
+            jmpr d   = D:\\JOB\\PowerShell\\Modules\\Jumper\\data
+
+            # target path can be valid path of any type of providers:
+            reg/win = HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion
+            ```
+    .Example
+
+        Jump to home (User Profile) dir:
+
+            PS> ~
+
+    .Example
+
+        Jump by label:
+
+            PS> ~ tmp
+
+    .Example
+
+        Whith additional part of path Jumper returns whole path combined of link
+        target and additional part.
+
+        Get link target:
+
+            PS> ~ temp .
+            C:\Temp
+
+            PS> ~ appd nuget
+            C:\Users\SynCap\AppData\Roaming\nuget
+
+    .Example
+
+        To get path without jump to target use `-ToString` switch or its alias - `-s`.
+
+            PS> ~ temp -s
+            C:\Temp
+
+    .Example
+
+        Force change location even additional path given (`-Force` or `-f` switch)
+
+            PS: ~ > ~ appd nuget -f
+            PS: C:\Users\SynCap\AppData\Roaming\NuGet >
+
+    .Example
+
+        Use shortcuts in commands and code:
+
+            PS> Get-ChildItem (~ appd .)
+            ...
+            PS> ls
+
+    .Example
+
+        Jump to system's "Start Menu" system folder
+
+            PS> ~ startMenu
+            ~\AppData\Roaming\Microsoft\Windows\Start Menu
+
+    .Example
+
+        Jump to existing folders with saving jump history. Path complition works fine.
+
+            PS C:\> ~ $HOME/.vscode/extensions/ms-vscode.powershell-2020.6.0/logs/
+            PS ~\.vscode\extensions\ms-vscode.powershell-2020.6.0\logs> _
+
 #>
 
-############################# CodeAnalysis
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'Jumper')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', '?')]
+############################# Code Analysis Suppress Rules
 
 ############################# Data
 $Script:Jumper = @{}
@@ -15,7 +116,7 @@ $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:DataDir = Join-Path $PSScriptRoot 'data'
 
 ############################# Helper functions
-function local:hr($Ch='-',$Cnt=[Math]::Floor($Host.Ui.RawUI.WindowSize.Width/2)){println "`e[33m",(($Ch)*$Cnt),"`e[0m"}
+function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
 function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::Write($Params -join '')}
 function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::WriteLine($Params -join '')}
 
@@ -37,7 +138,7 @@ function local:exps ([parameter(ValueFromPipeline)][string]$s) {
 function Read-JumperFile {
     param (
         $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
-        [Alias('a')] [Switch] $Append
+        [Alias('c')] [Switch] $Clear
     )
     if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
         $Path = $tp
@@ -50,18 +151,24 @@ function Read-JumperFile {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
-    if (!$Append) { $Script:Jumper.Clear() }
-
-    if ('json' -ieq ($Path.Split('.')[-1])) {
-        $Script:Jumper += ( Get-Content $Path | ConvertFrom-Json -AsHashtable )
-    } else {
-        Get-Content $Path | ConvertFrom-StringData | Foreach-Object { $Script:Jumper += $_}
+    function ReadFromJson($JsonPath) {Get-Content $JsonPath|ConvertFrom-Json -AsHashtable};
+    function ReadFromText($TextPath) {$Out=@{};Get-Content $TextPath|ConvertFrom-StringData|Foreach-Object{$Out += $_};$Out};
+    if ($Clear) { $Script:Jumper.Clear() }
+    ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | Foreach-Object{
+        foreach ($key in $_.Keys) {
+            if ($Script:Jumper.ContainsKey($key)) {
+                println "Conflicting data: label`e[33m $key`e[0m already exists"
+                println "Existing value: `e[36m", $Script:Jumper[$key],"`e[0m]"
+                println "New value: `e[96m", $_[$key], "`e[0m]"
+            } else {
+                $Script:Jumper.($key) = $_.($key)
+            }
+        }
     }
-
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
 }
 
-function Get-Jumper($filter) {
+function Get-Jumper($Filter,[Alias('w')][switch]$Wide) {
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
         Foreach-Object -Begin {$SNo=1} -Process {
             [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)`e[0m"; 'Target'= Expand-JumperLink $_.Name }
@@ -144,8 +251,8 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
-                    $JumpMessage = "`e[33m",$Label,"`e[0m - go back to `e[93m",$Target,
-                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m" -join ''
+                    $JumpMessage = "`e[0m Go back to `e[33m",$Target,
+                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m"
                     $Script:JumperHistory.RemoveAt($Script:JumperHistory.Count -1)
                     break;
                 }else{
@@ -154,7 +261,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "Label `e[1;33m",$Label,"`e[0m from Jumper list: `e[93m",$Script:Jumper[$Label],"`e[0m" -join ''
+                $JumpMessage = "Label `e[33m",$Label,"`e[0m from Jumper list: `e[33m",$Script:Jumper[$Label],"`e[0m"
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -162,20 +269,20 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label presented.",
-                    "Found shell folder for it: `e[93m", $Target,"`e[0m" -join ''
+                $JumpMessage = "`e[0m Label `e[33m",$Label,"`e[0m presented.",
+                    "Found shell folder for it: `e[33m", $Target,"`e[0m" -join ''
                 if (Test-Path $Target) {
                     break;
                 }
             }
         {Test-Path $Label} {
                 $Target = Resolve-Path $Label;
-                $JumpMessage = "`e[1;33m",$Label,"`e[0m - label is a real path: `e[93m",$Target,"`e[0m" -join ''
+                $JumpMessage = "`e[0m Label `e[33m",$Label," is a real path: `e[93m",$Target,"`e[0m"
                 break;
             }
         default {
                 $JumpMessage = "`e[0mProbably `e[91mno correct label`e[0m provided.`n",
-                    "Target will be set to the current location: `e[93m",$PWD,"`e[0m" -join ''
+                    "Target will be set to the current location: `e[33m",$PWD,"`e[0m"
                 $Target = $PWD
             }
     }
@@ -186,10 +293,44 @@ function Use-Jumper {
                  $Script:JumperHistory.Add( "$PWD" )
             }
         }
-        println $JumpMessage
+        if ($Verbose){println $JumpMessage}
         Set-Location $Target
     } else {
         return $Target
+    }
+}
+
+function Restart-JumperModule {
+    $Verbose = $Args.Verbose
+    println "Verbose: ", $Verbose
+    println "ARGS Count ", $Args.Count
+    hr
+    $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
+    Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
+    Remove-Module $ModuleName -Force -Verbose:($Args.Verbose)
+    Write-Verbose "JUMPER: try to LOAD $ModuleName ($PSScriptRoot)"
+    Import-Module $ModuleName -Force -Verbose:($Args.Verbose)
+}
+
+function Invoke-JumperCommand {
+    param(
+        [Parameter(position=0)] [String] $Command='Help'
+    )
+    "Command to execute: ", $Command
+
+    switch ($Command) {
+        {$_ -in ('a','add')}      {add-jumper $args; break}
+        {$_ -in ('rd','read')}    {Read-JumperFile $args;    break}
+        {$_ -in ('c','clear')}    {Clear-Jumper;             break}
+        {$_ -in ('g','get')}      {Get-Jumper $args;         break}
+        {$_ -in ('d','disable')}  {Disable-JumperLink $args; break}
+        {$_ -in ('e','expand')}   {Expand-JumperLink $args;  break}
+        {$_ -in ('rv','resolve')} {Resolve-JumperList;       break}
+        {$_ -in ('s','set')}      {Set-JumperLink $args;     break}
+        {$_ -in ('sv','save')}    {Save-JumperList $args;    break}
+        {$_ -in ('history')}      {Show-JumperHistory $args; break}
+        {$_ -in ('rt','restart')} {Restart-JumperModule;     break}
+        {$_ -in ('h','Help')}     {Get-Help ($PSScriptRoot)}
     }
 }
 
@@ -199,15 +340,18 @@ Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
 Set-Alias ajr   -Value Add-Jumper         -Description 'Add label to jumper list'
-Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
 Set-Alias cjr   -Value Clear-Jumper       -Description 'Clear jumper label list'
-Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
 Set-Alias djr   -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
 Set-Alias ejr   -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
+Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
+Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
 Set-Alias rvjr  -Value Resolve-JumperList -Description 'Expand all links in list'
+Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
 Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
-Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
+
+Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
+Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already poor 😥'
 
 ############################## Initialisation, Read default Data
 Read-JumperFile jumper.json

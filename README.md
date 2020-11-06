@@ -8,9 +8,9 @@ Module to provide folders' shortcuts in PowerShell console - quick jumps by labe
 - Target of links can contain environment variables;
 - Target of links can contain native PowerShell expressions evaluated at call time;
 - Lists of links can be combined from several files
+- Automatic expansions of links with shortcuts of shell folders
+- History of locations only in addition to yours' CLI history
 
-TODO:
-[] Automatic expansions of links with shortcuts of shell folders
 
 ## Sample link list file (INI format):
 
@@ -69,3 +69,21 @@ Use shortcuts in commands and code:
 	PS> Get-ChildItem (~ appd .)
 	...
 	PS> ls
+
+
+Use shortcuts in commands and code:
+
+    PS> Get-ChildItem (~ appd .)
+    ...
+    PS> ls
+
+Jump to system's "Start Menu" system folder
+
+    PS> ~ startMenu
+    ~\AppData\Roaming\Microsoft\Windows\Start Menu
+
+Jump to existing folders with saving jump history. Path complition works fine.
+
+    PS C:\> ~ $HOME/.vscode/extensions/ms-vscode.powershell-2020.6.0/logs/
+    PS ~\.vscode\extensions\ms-vscode.powershell-2020.6.0\logs> _
+
