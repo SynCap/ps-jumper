@@ -69,3 +69,21 @@ Use shortcuts in commands and code:
 	PS> Get-ChildItem (~ appd .)
 	...
 	PS> ls
+
+
+Use shortcuts in commands and code:
+
+    PS> Get-ChildItem (~ appd .)
+    ...
+    PS> ls
+
+Jump to system's "Start Menu" system folder
+
+    PS> ~ startMenu
+    ~\AppData\Roaming\Microsoft\Windows\Start Menu
+
+Jump to existing folders with saving jump history. Path complition works fine.
+
+    PS C:\> ~ $HOME/.vscode/extensions/ms-vscode.powershell-2020.6.0/logs/
+    PS ~\.vscode\extensions\ms-vscode.powershell-2020.6.0\logs> _
+
