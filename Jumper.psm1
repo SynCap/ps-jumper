@@ -151,14 +151,19 @@ function Read-JumperFile {
         Write-Warning "Jumper file `e[33m$Path`e[0m not found"
         return
     }
+    function ReadFromJson($JsonPath) {Get-Content $JsonPath|ConvertFrom-Json -AsHashtable};
+    function ReadFromText($TextPath) {$Out=@{};Get-Content $TextPath|ConvertFrom-StringData|Foreach-Object{$Out += $_};$Out};
     if (!$Append) { $Script:Jumper.Clear() }
-    $Conflicts = [System.Collections.Generic.List[string]]::new()
-    if ('json' -ieq ($Path.Split('.')[-1])) {
-        ( Get-Content $Path | ConvertFrom-Json -AsHashtable ).GetEnumerator() | Foreach-Object {
-            $Script:Jumper.Add($_.Name, $_.Value)
+    ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | Foreach-Object{
+        foreach ($key in $_.Keys) {
+            if ($Script:Jumper.ContainsKey($key)) {
+                println "Conflicting data: label`e[33m $key`e[0m already exists"
+                println "Existing value: `e[36m", $Script:Jumper[$key],"`e[0m]"
+                println "New value: `e[96m", $_[$key], "`e[0m]"
+            } else {
+                $Script:Jumper.($key) = $_.($key)
+            }
         }
-    } else {
-        Get-Content $Path | ConvertFrom-StringData | Foreach-Object { $Script:Jumper += $_}
     }
     Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
 }
@@ -335,15 +340,15 @@ Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
 
 Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
 Set-Alias ajr   -Value Add-Jumper         -Description 'Add label to jumper list'
-Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
 Set-Alias cjr   -Value Clear-Jumper       -Description 'Clear jumper label list'
-Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
 Set-Alias djr   -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
 Set-Alias ejr   -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
+Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
+Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
 Set-Alias rvjr  -Value Resolve-JumperList -Description 'Expand all links in list'
+Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
 Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
-Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
 
 Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
 Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already poor 😥'
