@@ -138,7 +138,7 @@ function local:exps ([parameter(ValueFromPipeline)][string]$s) {
 function Read-JumperFile {
     param (
         $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
-        [Alias('a')] [Switch] $Append
+        [Alias('c')] [Switch] $Clear
     )
     if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
         $Path = $tp
@@ -153,7 +153,7 @@ function Read-JumperFile {
     }
     function ReadFromJson($JsonPath) {Get-Content $JsonPath|ConvertFrom-Json -AsHashtable};
     function ReadFromText($TextPath) {$Out=@{};Get-Content $TextPath|ConvertFrom-StringData|Foreach-Object{$Out += $_};$Out};
-    if (!$Append) { $Script:Jumper.Clear() }
+    if ($Clear) { $Script:Jumper.Clear() }
     ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | Foreach-Object{
         foreach ($key in $_.Keys) {
             if ($Script:Jumper.ContainsKey($key)) {
