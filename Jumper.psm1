@@ -94,10 +94,17 @@
 
     .Example
 
-        Jump to system's "Start Menu"
+        Jump to system's "Start Menu" system folder
 
             PS> ~ startMenu
             ~\AppData\Roaming\Microsoft\Windows\Start Menu
+
+    .Example
+
+        Jump to existing folders with saving jump history. Path complition works fine.
+
+            PS C:\> ~ $HOME/.vscode/extensions/ms-vscode.powershell-2020.6.0/logs/
+            PS ~\.vscode\extensions\ms-vscode.powershell-2020.6.0\logs> _
 
 #>
 
