@@ -114,6 +114,7 @@
 $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:DataDir = Join-Path $PSScriptRoot 'data'
+$RC = $RC # Reset Console
 
 ############################# Helper functions
 function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
@@ -148,39 +149,40 @@ function Read-JumperFile {
         $Path = $tp
     }
     if (!(Test-Path $Path)) {
-        Write-Warning "Jumper file `e[33m$Path`e[0m not found"
+        Write-Warning "Jumper file `e[33m$Path${RC} not found"
         return
     }
     function ReadFromJson($JsonPath) {Get-Content $JsonPath|ConvertFrom-Json -AsHashtable};
-    function ReadFromText($TextPath) {$Out=@{};Get-Content $TextPath|ConvertFrom-StringData|Foreach-Object{$Out += $_};$Out};
+    function ReadFromText($TextPath) {$Out=@{};Get-Content $TextPath|
+        ConvertFrom-StringData|Foreach-Object{$Out += $_};$Out};
     if ($Clear) { $Script:Jumper.Clear() }
     ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | Foreach-Object{
         foreach ($key in $_.Keys) {
             if ($Script:Jumper.ContainsKey($key)) {
-                println "Conflicting data: label`e[33m $key`e[0m already exists"
-                println "Existing value: `e[36m", $Script:Jumper[$key],"`e[0m]"
-                println "New value: `e[96m", $_[$key], "`e[0m]"
+                println "Conflicting data: label`e[33m $key${RC} already exists"
+                println "Existing value: `e[36m", $Script:Jumper[$key],"${RC}]"
+                println "New value: `e[96m", $_[$key], "${RC}]"
             } else {
                 $Script:Jumper.($key) = $_.($key)
             }
         }
     }
-    Write-Verbose ( "`nLoad `e[93m{1}`e[0m jumps from `e[93m{0}`e[0m." -f $Path,$Script:Jumper.Count )
+    Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path,$Script:Jumper.Count )
 }
 
 function Get-Jumper($Filter,[Alias('w')][switch]$Wide) {
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
         Foreach-Object -Begin {$SNo=1} -Process {
-            [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)`e[0m"; 'Target'= Expand-JumperLink $_.Name }
+            [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)${RC}"; 'Target'= Expand-JumperLink $_.Name }
             $SNo++
         }
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
-    if ($Script:JumperHistory.Count) { hr } else {  "`e[33mNo Jumper history yet`e[0m"; return;  }
+    if ($Script:JumperHistory.Count) { hr } else {  "`e[33mNo Jumper history yet${RC}"; return;  }
     ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
         Foreach-Object -Begin{$Index=1} -Process {
-            println "`e[32m",$Index,". `e[0m",$_
+            println "`e[32m",$Index,". ${RC}",$_
             $index++
         }
 }
@@ -251,8 +253,8 @@ function Use-Jumper {
         '-' {
                 if($Script:JumperHistory.Count) {
                     $Target = $Script:JumperHistory[-1];
-                    $JumpMessage = "`e[0m Go back to `e[33m",$Target,
-                        "`e[0m from`nwhere Jumper were `e[33m",$PWD,"`e[0m"
+                    $JumpMessage = "${RC} Go back to `e[33m",$Target,
+                        "${RC} from`nwhere Jumper were `e[33m",$PWD,$RC
                     $Script:JumperHistory.RemoveAt($Script:JumperHistory.Count -1)
                     break;
                 }else{
@@ -261,7 +263,7 @@ function Use-Jumper {
                 }
             }
         {[bool]$Script:Jumper[$Label]} {
-                $JumpMessage = "Label `e[33m",$Label,"`e[0m from Jumper list: `e[33m",$Script:Jumper[$Label],"`e[0m"
+                $JumpMessage = "Label `e[33m",$Label,"${RC} from Jumper list: `e[33m",$Script:Jumper[$Label],$RC
                 $Target =  $Path ?
                     (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
                     (Expand-JumperLink $Label)
@@ -269,20 +271,20 @@ function Use-Jumper {
             }
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
-                $JumpMessage = "`e[0m Label `e[33m",$Label,"`e[0m presented.",
-                    "Found shell folder for it: `e[33m", $Target,"`e[0m" -join ''
+                $JumpMessage = "${RC} Label `e[33m",$Label,"${RC} presented.",
+                    "Found shell folder for it: `e[33m", $Target,$RC -join ''
                 if (Test-Path $Target) {
                     break;
                 }
             }
         {Test-Path $Label} {
                 $Target = Resolve-Path $Label;
-                $JumpMessage = "`e[0m Label `e[33m",$Label," is a real path: `e[93m",$Target,"`e[0m"
+                $JumpMessage = "${RC} Label `e[33m",$Label," is a real path: `e[93m",$Target,$RC
                 break;
             }
         default {
-                $JumpMessage = "`e[0mProbably `e[91mno correct label`e[0m provided.`n",
-                    "Target will be set to the current location: `e[33m",$PWD,"`e[0m"
+                $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
+                    "Target will be set to the current location: `e[33m",$PWD,$RC
                 $Target = $PWD
             }
     }
@@ -300,37 +302,41 @@ function Use-Jumper {
     }
 }
 
-function Restart-JumperModule {
-    $Verbose = $Args.Verbose
+function Restart-JumperModule ([Switch] $Verbose=$false) {
     println "Verbose: ", $Verbose
     println "ARGS Count ", $Args.Count
     hr
     $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
     Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
-    Remove-Module $ModuleName -Force -Verbose:($Args.Verbose)
+    Remove-Module $ModuleName -Force -Verbose:$Verbose
     Write-Verbose "JUMPER: try to LOAD $ModuleName ($PSScriptRoot)"
-    Import-Module $ModuleName -Force -Verbose:($Args.Verbose)
+    Import-Module $ModuleName -Force -Verbose:$Verbose
 }
 
 function Invoke-JumperCommand {
     param(
         [Parameter(position=0)] [String] $Command='Help'
     )
-    "Command to execute: ", $Command
-
     switch ($Command) {
-        {$_ -in ('a','add')}      {add-jumper $args; break}
-        {$_ -in ('rd','read')}    {Read-JumperFile $args;    break}
+
+        {$_ -in ('a','add')}      {add-jumper @args;         break}
         {$_ -in ('c','clear')}    {Clear-Jumper;             break}
-        {$_ -in ('g','get')}      {Get-Jumper $args;         break}
-        {$_ -in ('d','disable')}  {Disable-JumperLink $args; break}
-        {$_ -in ('e','expand')}   {Expand-JumperLink $args;  break}
-        {$_ -in ('rv','resolve')} {Resolve-JumperList;       break}
-        {$_ -in ('s','set')}      {Set-JumperLink $args;     break}
-        {$_ -in ('sv','save')}    {Save-JumperList $args;    break}
-        {$_ -in ('history')}      {Show-JumperHistory $args; break}
+        {$_ -in ('d','disable')}  {Disable-JumperLink @args; break}
+        {$_ -in ('e','expand')}   {Expand-JumperLink @args;  break}
+        {$_ -in ('g','get')}      {Get-Jumper @args;         break}
+        {$_ -in ('history')}      {Show-JumperHistory @args; break}
+        {$_ -in ('rd','read')}    {Read-JumperFile @args;    break}
         {$_ -in ('rt','restart')} {Restart-JumperModule;     break}
-        {$_ -in ('h','Help')}     {Get-Help ($PSScriptRoot)}
+        {$_ -in ('rv','resolve')} {Resolve-JumperList;       break}
+        {$_ -in ('s','set')}      {Set-JumperLink @args;     break}
+        {$_ -in ('sv','save')}    {Save-JumperList @args;    break}
+
+        {$_ -in ('h','Help')}     {Help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break}
+        default {
+            println "Command: `e[33m", $Command, $RC
+            "Unbound arguments:"
+            $args
+        }
     }
 }
 
