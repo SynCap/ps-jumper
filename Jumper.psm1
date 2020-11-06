@@ -118,21 +118,10 @@ $RC = $RC # Reset Console
 
 ############################# Helper functions
 function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
-function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::Write($Params -join '')}
-function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[System.Console]::WriteLine($Params -join '')}
-
-function local:spf ([parameter(ValueFromPipeline,position=0)][string] $ShFName) {
-    try {
-        [Environment]::GetFolderPath($ShFName)
-    } catch {
-        $ShFName
-    }
-}
-
-function local:exps ([parameter(ValueFromPipeline)][string]$s) {
-    $re = '#\(\s*(\w+?)\s*\)'
-    $s -replace $re, { $_.Groups[1].Value | spf }
-}
+function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::Write($Params -join '')}
+function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::WriteLine($Params -join '')}
+function local:spf([parameter(ValueFromPipeline,position=0)][string]$ShFName){try{[Environment]::GetFolderPath($ShFName)}catch{$ShFName}}
+function local:exps([parameter(ValueFromPipeline)][string]$s){$re='#\(\s*(\w+?)\s*\)';$s -replace $re,{$_.Groups[1].Value|spf}}
 
 ############################# Module Core
 
