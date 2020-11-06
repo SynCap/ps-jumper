@@ -137,6 +137,10 @@ function local:exps ([parameter(ValueFromPipeline)][string]$s) {
 ############################# Module Core
 
 function Read-JumperFile {
+    <#
+    .synopsis
+        Set or enhance jumper label list from JSON or text (INI) file
+    #>
     param (
         $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
         [Alias('c')] [Switch] $Clear
@@ -171,6 +175,10 @@ function Read-JumperFile {
 }
 
 function Get-Jumper($Filter,[Alias('w')][switch]$Wide) {
+    <#
+    .synopsis
+        Get full or filtered jumper link list
+    #>
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
         Foreach-Object -Begin {$SNo=1} -Process {
             [PSCustomObject]@{ '###'=$SNo; 'Label'= $_.Name; 'Link'= "`e[32m$($_.Value)${RC}"; 'Target'= Expand-JumperLink $_.Name }
@@ -179,6 +187,10 @@ function Get-Jumper($Filter,[Alias('w')][switch]$Wide) {
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
+    <#
+    .synopsis
+        Just show saved history of jumps
+    #>
     if ($Script:JumperHistory.Count) { hr } else {  "`e[33mNo Jumper history yet${RC}"; return;  }
     ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
         Foreach-Object -Begin{$Index=1} -Process {
@@ -188,6 +200,10 @@ function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
 }
 
 function Set-JumperLink {
+    <#
+    .synopsis
+        Direct updates the Jumper Link
+    #>
     param(
         [Parameter(mandatory,position=0)]                   $Label,
         [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
@@ -196,6 +212,13 @@ function Set-JumperLink {
 }
 
 function Add-Jumper  {
+    <#
+    .synopsis
+        Add label + link to jumper list
+    .example
+        PS> Add-Jumper prj '#(MyDocuments)\\Projects'
+        PS> Add-Jumper tls '%ProgramFiles%\\Microsoft\\Build Tools'
+    #>
     param(
         [Parameter(mandatory,position=0)]                   $Label,
         [Parameter(mandatory,position=1,ValueFromPipeline)] $Path
@@ -203,10 +226,25 @@ function Add-Jumper  {
     $Script:Jumper.Add($Label, $Path)
 }
 
-function Disable-JumperLink ($Label) { $Script:Jumper.Remove($Label) }
-function Clear-Jumper {$Script:Jumper.Clear()}
+function Disable-JumperLink ([Parameter(mandatory)] $Label) {
+    <#
+    .synopsis
+        Remove record from jumper label list
+    #>
+    $Script:Jumper.Remove($Label)
+}
+
+function Clear-Jumper {
+<#
+    .synopsis
+        Clear jumper label list
+#>$Script:Jumper.Clear()}
 
 function Save-JumperList {
+    <#
+    .synopsis
+        Save current Jumper Links List to the file
+    #>
     Param (
         $Path = (Join-Path $Script:DataDir 'jumper.json')
     )
@@ -218,6 +256,10 @@ function Save-JumperList {
 }
 
 function Expand-JumperLink  {
+    <#
+    .synopsis
+        Expand path variables and evaluate expressions in value of jumper link
+    #>
     param (
         [Parameter(Mandatory,ValueFromPipeline,Position=0)]
         $Label
@@ -232,12 +274,20 @@ function Expand-JumperLink  {
 }
 
 function Resolve-JumperList {
+    <#
+    .synopsis
+        Expand all links in list
+    #>
     foreach ($Label in $Script:Jumper.Keys) {
         $Script:Jumper[$Label] = Expand-JumperLink $Label
     }
 }
 
 function Use-Jumper {
+    <#
+    .synopsis
+        Jump to target using label and added path or get the resolved path
+    #>
     param (
         [Parameter(position=0)] $Label='~',
         [Parameter(position=1)] $Path='',
@@ -314,6 +364,10 @@ function Restart-JumperModule ([Switch] $Verbose=$false) {
 }
 
 function Invoke-JumperCommand {
+    <#
+    .synopsis
+        Main command centre of module
+    #>
     param(
         [Parameter(position=0)] [String] $Command='Help'
     )
@@ -357,7 +411,7 @@ Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumpe
 Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
 
 Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
-Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already poor 😥'
+Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already very buisy 😥'
 
 ############################## Initialisation, Read default Data
 Read-JumperFile jumper.json
