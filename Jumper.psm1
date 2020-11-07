@@ -152,9 +152,9 @@ function Read-JumperFile {
     ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | Foreach-Object{
         foreach ($key in $_.Keys) {
             if ($Script:Jumper.ContainsKey($key)) {
-                println "Conflicting data: label`e[33m $key${RC} already exists"
-                println "Existing value: `e[36m", $Script:Jumper[$key],"${RC}]"
-                println "New value: `e[96m", $_[$key], "${RC}]"
+                println "`e[31mConflicting data: label`e[91m $key`e[31m already exists", $RC
+                println "Existing value: `e[36m", $Script:Jumper[$key], $RC
+                println "New value: `e[96m", $_[$key], $RC
             } else {
                 $Script:Jumper.($key) = $_.($key)
             }
@@ -311,7 +311,7 @@ function Use-Jumper {
         {$Label -in [System.Environment+SpecialFolder].GetEnumNames()} {
                 $Target = spf $Label;
                 $JumpMessage = "${RC} Label `e[33m",$Label,"${RC} presented.",
-                    "Found shell folder for it: `e[33m", $Target,$RC -join ''
+                    "Found shell folder for it: `e[33m", $Target,$RC
                 if (Test-Path $Target) {
                     break;
                 }
