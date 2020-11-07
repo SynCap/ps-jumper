@@ -359,17 +359,17 @@ function Invoke-JumperCommand {
     )
     switch ($Command) {
 
-        {$_ -in ('a','add')}      {add-jumper @args;         break}
+        {$_ -in ('a','add')}      {& add-jumper @args;         break}
         {$_ -in ('c','clear')}    {Clear-Jumper;             break}
-        {$_ -in ('d','disable')}  {Disable-JumperLink @args; break}
-        {$_ -in ('e','expand')}   {Expand-JumperLink @args;  break}
-        {$_ -in ('g','get')}      {Get-Jumper @args;         break}
-        {$_ -in ('history')}      {Show-JumperHistory @args; break}
-        {$_ -in ('rd','read')}    {Read-JumperFile @args;    break}
+        {$_ -in ('d','disable')}  {& Disable-JumperLink @args; break}
+        {$_ -in ('e','expand')}   {& Expand-JumperLink @args;  break}
+        {$_ -in ('g','get')}      {& Get-Jumper @args;         break}
+        {$_ -in ('history')}      {& Show-JumperHistory @args; break}
+        {$_ -in ('rd','read')}    {& Read-JumperFile @args;    break}
         {$_ -in ('rt','restart')} {Restart-JumperModule;     break}
         {$_ -in ('rv','resolve')} {Resolve-JumperList;       break}
-        {$_ -in ('s','set')}      {Set-JumperLink @args;     break}
-        {$_ -in ('sv','save')}    {Save-JumperList @args;    break}
+        {$_ -in ('s','set')}      {& Set-JumperLink @args;     break}
+        {$_ -in ('sv','save')}    {& Save-JumperList @args;    break}
 
         {$_ -in ('h','Help')}     {Help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break}
         default {
