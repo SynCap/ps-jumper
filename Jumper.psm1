@@ -302,8 +302,8 @@ function Use-Jumper {
     param (
         [Parameter(position = 0)] $Label = '~',
         [Parameter(position = 1)] $Path = '',
-        [Alias('s')] [Switch]     $AsString = $false
-        [Alias('f')] [Switch]     $Force = $false,
+        [Alias('s')] [Switch]     $AsString = $false,
+        [Alias('f')] [Switch]     $Force = $false
     )
 
     switch ($Label) {
