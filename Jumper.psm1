@@ -365,7 +365,10 @@ function Use-Jumper {
     }
 }
 
-function Restart-JumperModule ([Switch] $Verbose = $false) {
+function Restart-JumperModule {
+    [CmdletBinding()]
+    Param(
+    )
     println "Verbose: ", $Verbose
     println "ARGS Count ", $Args.Count
     hr
