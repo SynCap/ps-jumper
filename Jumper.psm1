@@ -374,6 +374,8 @@ function Invoke-JumperCommand {
         {$_ -in ('h','Help')}     {Help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break}
         default {
             println "Command: `e[33m", $Command, $RC
+            println '$VerbosePreference: ',$VerbosePreference
+            hr
             "Unbound arguments:"
             $args
         }
