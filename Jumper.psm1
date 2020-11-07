@@ -382,27 +382,31 @@ function Invoke-JumperCommand {
         Main command centre of module
     #>
     param(
-        [Parameter(position = 0)] [String] $Command = 'Help'
+        [Parameter(position = 0)] [String] $Command = 'Help',
+        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
     )
     switch ($Command) {
 
-        { $_ -in ('a', 'add') } { Add-Jumper @args; break }
-        { $_ -in ('c', 'clear') } { Clear-Jumper; break }
-        { $_ -in ('d', 'disable') } { Disable-JumperLink @args; break }
-        { $_ -in ('e', 'expand') } { Expand-JumperLink @args; break }
-        { $_ -in ('g', 'get') } { Get-Jumper @args; break }
-        { $_ -in ('history') } { Show-JumperHistory @args; break }
-        { $_ -in ('rd', 'read') } { Read-JumperFile @args; break }
-        { $_ -in ('rt', 'restart') } { Restart-JumperModule; break }
-        { $_ -in ('rv', 'resolve') } { Resolve-JumperList; break }
-        { $_ -in ('s', 'set') } { Set-JumperLink @args; break }
-        { $_ -in ('sv', 'save') } { Save-JumperList @args; break }
+        { $_ -in ('a', 'add')      } { Add-Jumper @Params;         break }
+        { $_ -in ('c', 'clear')    } { Clear-Jumper;               break }
+        { $_ -in ('d', 'disable')  } { Disable-JumperLink @Params; break }
+        { $_ -in ('e', 'expand')   } { Expand-JumperLink @Params;  break }
+        { $_ -in ('g', 'get')      } { Get-Jumper @Params;         break }
+        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
+        { $_ -in ('rd', 'read')    } { Read-JumperFile @Params;    break }
+        { $_ -in ('rt', 'restart') } { Restart-JumperModule;       break }
+        { $_ -in ('rv', 'resolve') } { Resolve-JumperList;         break }
+        { $_ -in ('s', 'set')      } { Set-JumperLink @Params;     break }
+        { $_ -in ('sv', 'save')    } { Save-JumperList @Params;    break }
 
-        { $_ -in ('h', 'Help') } { help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break }
+        { $_ -in ('h', 'Help') } {
+            help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break
+        }
+
         default {
             println "Command: `e[33m", $Command, $RC
             "Unbound arguments:"
-            $args
+            $Params
         }
     }
 }
