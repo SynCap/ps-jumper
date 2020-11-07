@@ -344,9 +344,9 @@ function Use-Jumper {
 function Restart-JumperModule {
     $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
     Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
-    Remove-Module $ModuleName -Force -Verbose:$Verbose
+    & Remove-Module $ModuleName -Force -Verbose:$Verbose
     Write-Verbose "JUMPER: try to LOAD $ModuleName ($PSScriptRoot)"
-    Import-Module $ModuleName -Force -Verbose:$Verbose
+    & Import-Module $ModuleName -Force -Verbose:$Verbose
 }
 
 function Invoke-JumperCommand {
