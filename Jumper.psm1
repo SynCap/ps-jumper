@@ -111,17 +111,17 @@
 ############################# Code Analysis Suppress Rules
 
 ############################# Data
-$Script:Jumper = @{}
-$Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-$Script:DataDir = Join-Path $PSScriptRoot 'data'
-$RC = $RC # Reset Console
+    $Script:Jumper = @{}
+    $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
+    $Script:DataDir = Join-Path $PSScriptRoot 'data'
+    $RC = "`e[0m" # Reset Console
 
 ############################# Helper functions
-function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
-function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::Write($Params -join '')}
-function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::WriteLine($Params -join '')}
-function local:spf([parameter(ValueFromPipeline,position=0)][string]$ShFName){try{[Environment]::GetFolderPath($ShFName)}catch{$ShFName}}
-function local:exps([parameter(ValueFromPipeline)][string]$s){$re='#\(\s*(\w+?)\s*\)';$s -replace $re,{$_.Groups[1].Value|spf}}
+    function local:hr($Ch='-',$Cnt=0-bor[Console]::WindowWidth/2){$Ch*$Cnt}
+    function local:print([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::Write($Params -join '')}
+    function local:println([Parameter(ValueFromPipeline)][String[]]$Params){[Console]::WriteLine($Params -join '')}
+    function local:spf([parameter(ValueFromPipeline,position=0)][string]$ShFName){try{[Environment]::GetFolderPath($ShFName)}catch{$ShFName}}
+    function local:exps([parameter(ValueFromPipeline)][string]$s){$re='#\(\s*(\w+?)\s*\)';$s -replace $re,{$_.Groups[1].Value|spf}}
 
 ############################# Module Core
 
