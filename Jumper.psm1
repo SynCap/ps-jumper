@@ -366,12 +366,9 @@ function Use-Jumper {
 }
 
 function Restart-JumperModule {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     Param(
     )
-    println "Verbose: ", $Verbose
-    println "ARGS Count ", $Args.Count
-    hr
     $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
     Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
     Remove-Module $ModuleName -Force -Verbose:$Verbose
