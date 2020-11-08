@@ -418,11 +418,11 @@ function Invoke-JumperCommand {
         { $_ -in ('d', 'disable')  } { Disable-JumperLink @Params; break }
         { $_ -in ('e', 'expand')   } { Expand-JumperLink @Params;  break }
         { $_ -in ('g', 'get')      } { Get-Jumper @Params;         break }
-        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
         { $_ -in ('rd', 'read')    } { Read-JumperFile @Params;    break }
         { $_ -in ('rt', 'restart') } { Restart-JumperModule;       break }
         { $_ -in ('rv', 'resolve') } { Resolve-JumperList;         break }
         { $_ -in ('s', 'set')      } { Set-JumperLink @Params;     break }
+        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
         { $_ -in ('sv', 'save')    } { Save-JumperList @Params;    break }
 
         { $_ -in ('h', 'Help') } {
