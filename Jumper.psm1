@@ -439,22 +439,24 @@ function Invoke-JumperCommand {
 
 ############################# Module specific Aliases
 
-Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
+    Set-Alias JMP   -Value Get-Jumper           -Description "Gets the list of the Jumper links"
 
-Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
-Set-Alias ajr   -Value Add-Jumper         -Description 'Add label to jumper list'
-Set-Alias cjr   -Value Clear-Jumper       -Description 'Clear jumper label list'
-Set-Alias djr   -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
-Set-Alias ejr   -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
-Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
-Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
-Set-Alias rvjr  -Value Resolve-JumperList -Description 'Expand all links in list'
-Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
-Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
-Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
+    Set-Alias  ~    -Value Use-Jumper           -Description 'Jump to target using label and added path or get the resolved path'
+    Set-Alias ajr   -Value Add-Jumper           -Description 'Add label to jumper list'
+    Set-Alias cjr   -Value Clear-Jumper         -Description 'Clear jumper label list'
+    Set-Alias djr   -Value Disable-JumperLink   -Description 'Remove record from jumper label list by label'
+    Set-Alias ejr   -Value Expand-JumperLink    -Description 'Expand path variables and evaluate expressions in value of jumper link'
+    Set-Alias gjr   -Value Get-Jumper           -Description 'Get full or filtered jumper link list'
+    Set-Alias rdjr  -Value Read-JumperFile      -Description 'Set or enhance jumper label list from JSON or text (INI) file'
+    Set-Alias rtjr  -Value Restart-JumperModule -Description 'Trye to reload module itself'
+    Set-Alias rvjr  -Value Resolve-JumperList   -Description 'Expand all links in list'
+    Set-Alias shjrh -Value Show-JumperHistory   -Description 'Just show saved history of jumps'
+    Set-Alias sjr   -Value Set-JumperLink       -Description 'Direct updates the Jumper Link'
+    Set-Alias svjr  -Value Save-JumperList      -Description 'Save current Jumper Links List to the file'
 
-Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
-Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
+    Set-Alias jr    -Value Invoke-JumperCommand -Description 'Main command centre of module'
+    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
 
 ############################## Initialisation, Read default Data
-Read-JumperFile jumper.json
+
+    Read-JumperFile jumper.json
