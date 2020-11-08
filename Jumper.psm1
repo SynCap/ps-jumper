@@ -311,6 +311,7 @@ function Use-Jumper {
             $Target = $Env:USERPROFILE;
             break;
         }
+
         '-' {
             if ($Script:JumperHistory.Count) {
                 $Target = $Script:JumperHistory[-1];
@@ -324,6 +325,7 @@ function Use-Jumper {
                 return;
             }
         }
+
         { [bool]$Script:Jumper[$Label] } {
             $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Script:Jumper[$Label], $RC
             $Target = $Path ?
@@ -331,6 +333,7 @@ function Use-Jumper {
             (Expand-JumperLink $Label)
             break;
         }
+
         { $Label -in [System.Environment+SpecialFolder].GetEnumNames() } {
             $Target = spf $Label;
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} presented.",
@@ -339,17 +342,20 @@ function Use-Jumper {
                 break;
             }
         }
+
         { Test-Path $Label } {
             $Target = Resolve-Path $Label;
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path: `e[93m", $Target, $RC
             break;
         }
+
         default {
             $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
             "Target will be set to the current location: `e[33m", $PWD, $RC
             $Target = $PWD
         }
     }
+
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
         if ('-' -ne $Label) {
