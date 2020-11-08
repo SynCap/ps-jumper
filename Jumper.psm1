@@ -311,6 +311,7 @@ function Use-Jumper {
             $Target = $Env:USERPROFILE;
             break;
         }
+
         '-' {
             if ($Script:JumperHistory.Count) {
                 $Target = $Script:JumperHistory[-1];
@@ -324,6 +325,7 @@ function Use-Jumper {
                 return;
             }
         }
+
         { [bool]$Script:Jumper[$Label] } {
             $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Script:Jumper[$Label], $RC
             $Target = $Path ?
@@ -331,6 +333,7 @@ function Use-Jumper {
             (Expand-JumperLink $Label)
             break;
         }
+
         { $Label -in [System.Environment+SpecialFolder].GetEnumNames() } {
             $Target = spf $Label;
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} presented.",
@@ -339,17 +342,20 @@ function Use-Jumper {
                 break;
             }
         }
+
         { Test-Path $Label } {
             $Target = Resolve-Path $Label;
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path: `e[93m", $Target, $RC
             break;
         }
+
         default {
             $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
             "Target will be set to the current location: `e[33m", $PWD, $RC
             $Target = $PWD
         }
     }
+
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
         if ('-' -ne $Label) {
@@ -365,10 +371,10 @@ function Use-Jumper {
     }
 }
 
-function Restart-JumperModule ([Switch] $Verbose = $false) {
-    println "Verbose: ", $Verbose
-    println "ARGS Count ", $Args.Count
-    hr
+function Restart-JumperModule {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param(
+    )
     $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
     Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
     Remove-Module $ModuleName -Force -Verbose:$Verbose
@@ -378,13 +384,36 @@ function Restart-JumperModule ([Switch] $Verbose = $false) {
 
 function Invoke-JumperCommand {
     <#
-    .synopsis
-        Main command centre of module
+        .synopsis
+            Main command centre of module
+
+        .Description.
+            Allow to launch Jumper commands in unified manner like a single cmdlet or app.
+
+            Registered commands:
+
+                go         Jump to target using label and added path or get the resolved path.
+
+                add        Add label to jumper list:
+                              jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                clear      Clear jumper label list
+                disable    Remove record from jumper label list by label: jr disable <Label>
+                expand     Expand path variables and evaluate expressions in value of jumper link
+                get        Get full or filtered jumper link list: jr get [match_mask]
+                history    Show session history of jumps
+                read       Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
+                resolve    Expand all links in list. May be need for further save a file with list of all link targets expanded
+                restart    Try to reload module itself
+                set        Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                save       Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
+
     #>
+
     param(
         [Parameter(position = 0)] [String] $Command = 'Help',
         [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
     )
+
     switch ($Command) {
 
         { $_ -in ('a', 'add')      } { Add-Jumper @Params;         break }
@@ -392,11 +421,11 @@ function Invoke-JumperCommand {
         { $_ -in ('d', 'disable')  } { Disable-JumperLink @Params; break }
         { $_ -in ('e', 'expand')   } { Expand-JumperLink @Params;  break }
         { $_ -in ('g', 'get')      } { Get-Jumper @Params;         break }
-        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
         { $_ -in ('rd', 'read')    } { Read-JumperFile @Params;    break }
         { $_ -in ('rt', 'restart') } { Restart-JumperModule;       break }
         { $_ -in ('rv', 'resolve') } { Resolve-JumperList;         break }
         { $_ -in ('s', 'set')      } { Set-JumperLink @Params;     break }
+        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
         { $_ -in ('sv', 'save')    } { Save-JumperList @Params;    break }
 
         { $_ -in ('h', 'Help') } {
@@ -413,22 +442,24 @@ function Invoke-JumperCommand {
 
 ############################# Module specific Aliases
 
-Set-Alias JMP -Value Get-Jumper -Description "Gets the list of the Jumper links"
+    Set-Alias JMP   -Value Get-Jumper           -Description "Gets the list of the Jumper links"
 
-Set-Alias  ~    -Value Use-Jumper         -Description 'Jump to target using label and added path or get the resolved path'
-Set-Alias ajr   -Value Add-Jumper         -Description 'Add label to jumper list'
-Set-Alias cjr   -Value Clear-Jumper       -Description 'Clear jumper label list'
-Set-Alias djr   -Value Disable-JumperLink -Description 'Remove record from jumper label list by label'
-Set-Alias ejr   -Value Expand-JumperLink  -Description 'Expand path variables and evaluate expressions in value of jumper link'
-Set-Alias gjr   -Value Get-Jumper         -Description 'Get full or filtered jumper link list'
-Set-Alias rdjr  -Value Read-JumperFile    -Description 'Set or enhance jumper label list from JSON or text (INI) file'
-Set-Alias rvjr  -Value Resolve-JumperList -Description 'Expand all links in list'
-Set-Alias shjrh -Value Show-JumperHistory -Description 'Just show saved history of jumps'
-Set-Alias sjr   -Value Set-JumperLink     -Description 'Direct updates the Jumper Link'
-Set-Alias svjr  -Value Save-JumperList    -Description 'Save current Jumper Links List to the file'
+    Set-Alias  ~    -Value Use-Jumper           -Description 'Jump to target using label and added path or get the resolved path'
+    Set-Alias ajr   -Value Add-Jumper           -Description 'Add label to jumper list'
+    Set-Alias cjr   -Value Clear-Jumper         -Description 'Clear jumper label list'
+    Set-Alias djr   -Value Disable-JumperLink   -Description 'Remove record from jumper label list by label'
+    Set-Alias ejr   -Value Expand-JumperLink    -Description 'Expand path variables and evaluate expressions in value of jumper link'
+    Set-Alias gjr   -Value Get-Jumper           -Description 'Get full or filtered jumper link list'
+    Set-Alias rdjr  -Value Read-JumperFile      -Description 'Set or enhance jumper label list from JSON or text (INI) file'
+    Set-Alias rtjr  -Value Restart-JumperModule -Description 'Trye to reload module itself'
+    Set-Alias rvjr  -Value Resolve-JumperList   -Description 'Expand all links in list'
+    Set-Alias shjrh -Value Show-JumperHistory   -Description 'Just show saved history of jumps'
+    Set-Alias sjr   -Value Set-JumperLink       -Description 'Direct updates the Jumper Link'
+    Set-Alias svjr  -Value Save-JumperList      -Description 'Save current Jumper Links List to the file'
 
-Set-Alias jr   -Value Invoke-JumperCommand -Description 'Main command centre of module'
-Set-Alias g    -Value ~                    -Description 'Clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
+    Set-Alias jr    -Value Invoke-JumperCommand -Description 'Main command centre of module'
+    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
 
 ############################## Initialisation, Read default Data
-Read-JumperFile jumper.json
+
+    Read-JumperFile jumper.json
