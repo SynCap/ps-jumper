@@ -2,7 +2,7 @@ Import-Module platyps
 
 Import-Module Jumper -Force
 
-$OutputFolder = '.\Docs'
+$OutputFolder = Join-Path $PSScriptRoot '..\Docs' -Resolve -Force
 $parameters = @{
     Module = 'Jumper'
     OutputFolder = $OutputFolder
@@ -14,3 +14,7 @@ $parameters = @{
 New-MarkdownHelp @parameters
 
 New-MarkdownAboutHelp -OutputFolder $OutputFolder -AboutName 'about_Jumper'
+
+# New-ExternalHelp –Path <folder with MDs> -OutputPath <output help folder>
+# Get-HelpPreview -Path "<ModuleName>-Help.xml"
+
