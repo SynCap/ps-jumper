@@ -3,7 +3,7 @@
   "temp" : "%TEMP%",
   "tmp"  : "%TEMP%",
 
-  "appd"  : "=$env:APPDATA",
+  "appd"  : "=$env:AppData",
   "ps/h"  : "=Split-Path $Profile",
   "ps/hm" : "=Join-Path (Split-Path $Profile) Modules",
   "ps/hs" : "=Join-Path (Split-Path $Profile) Scripts",
