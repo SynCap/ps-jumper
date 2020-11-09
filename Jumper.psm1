@@ -190,8 +190,7 @@ function Get-Jumper($Filter, [Alias('w')][switch]$Wide) {
         Get full or filtered jumper link list
     #>
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
-        ForEach-Object {
-            $SNo = 1
+        ForEach-Object -Begin {$SNo = 1} -Process {
             [PSCustomObject]@{ '###' = $SNo; 'Label' = $_.Name; 'Link' = "`e[32m$($_.Value)${RC}"; 'Target' = Expand-JumperLink $_.Name }
             $SNo++
         }
