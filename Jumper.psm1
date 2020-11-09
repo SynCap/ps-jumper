@@ -394,20 +394,20 @@ function Invoke-JumperCommand {
 
             Registered commands:
 
-                go         Jump to target using label and added path or get the resolved path.
+                go            Jump to target using label and added path or get the resolved path.
 
-                add        Add label to jumper list:
-                              jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                clear      Clear jumper label list
-                disable    Remove record from jumper label list by label: jr disable <Label>
-                expand     Expand path variables and evaluate expressions in value of jumper link
-                get        Get full or filtered jumper link list: jr get [match_mask]
-                history    Show session history of jumps
-                read       Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
-                resolve    Expand all links in list. May be need for further save a file with list of all link targets expanded
-                restart    Try to reload module itself
-                set        Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                save       Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
+                add           Add label to jumper list:
+                                 jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                c  | clear    Clear jumper label list
+                d  | disable  Remove record from jumper label list by label: jr disable <Label>
+                e  | expand   Expand path variables and evaluate expressions in value of jumper link
+                g  | get      Get full or filtered jumper link list: jr get [match_mask]
+                rd | history  Show session history of jumps
+                rt | read     Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
+                rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
+                s  | restart  Try to reload module itself
+                sh | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
+                sv | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
 
     #>
 
