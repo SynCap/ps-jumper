@@ -142,41 +142,45 @@ function Read-JumperFile {
     .synopsis
         Set or enhance jumper label list from JSON or text (INI) file
     #>
+
+    # [CmdletBinding(SupportsShouldProcess)]
     param (
         $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
         [Alias('c')] [Switch] $Clear
     )
+
     if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
         $Path = $tp
-    }
-    elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
         $Path = $tp
-    }
-    elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.ini")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.ini")) {
         $Path = $tp
-    }
-    if (!(Test-Path $Path)) {
+    } if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path${RC} not found"
         return
     }
+
     function ReadFromJson($JsonPath) { Get-Content $JsonPath | ConvertFrom-Json -AsHashtable };
     function ReadFromText($TextPath) {
         $Out = @{}; Get-Content $TextPath |
             ConvertFrom-StringData | ForEach-Object { $Out += $_ }; $Out
     };
+
     if ($Clear) { $Script:Jumper.Clear() }
     ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | ForEach-Object {
         foreach ($key in $_.Keys) {
             if ($Script:Jumper.ContainsKey($key)) {
-                println "`e[31mConflicting data: label`e[91m $key`e[31m already exists", $RC
-                println "Existing value: `e[36m", $Script:Jumper[$key], $RC
-                println "New value: `e[96m", $_[$key], $RC
+                println "`e[33m",
+                        "Link conflict: label`e[91m $key`e[33m already exists", $RC
+                println "       Exists: `e[36m", $Script:Jumper[$key], $RC
+                println "  Want to add: `e[96m", $_[$key], $RC
             }
             else {
                 $Script:Jumper.($key) = $_.($key)
             }
         }
     }
+
     Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Script:Jumper.Count )
 }
 
