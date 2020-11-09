@@ -203,8 +203,7 @@ function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
     #>
     if ($Script:JumperHistory.Count) { hr } else { "`e[33mNo Jumper history yet${RC}"; return; }
     ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
-        ForEach-Object {
-            $Index = 1
+        ForEach-Object -Begin {$Index = 1} -Process {
             println "`e[32m", $Index, ". ", $RC, $_
             $index++
         }
