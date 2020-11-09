@@ -145,8 +145,8 @@ function Read-JumperFile {
 
     # [CmdletBinding(SupportsShouldProcess)]
     param (
-        $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
-        [Alias('c')] [Switch] $Clear
+        [Parameter(position = 0)] $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
+        [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
 
     if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
