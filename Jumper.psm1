@@ -413,22 +413,30 @@ function Invoke-JumperCommand {
 
     param(
         [Parameter(position = 0)] [String] $Command = 'Help',
-        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
+        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $ParamsIn
     )
+
+    if ($ParamsIn) {
+        println "Comad centre params:"
+        $ParamsIn | ForEach-Object {
+            println "`t`e[33m",$_,$RC
+        }
+    }
+    $ParamsOut = $ParamsIn # todo: ParamsOut должен стать Hashtable
 
     switch ($Command) {
 
-        { $_ -in ('a',  'add')     } { Add-Jumper @Params;         break }
-        { $_ -in ('c',  'clear')   } { Clear-Jumper;               break }
-        { $_ -in ('d',  'disable') } { Disable-JumperLink @Params; break }
-        { $_ -in ('e',  'expand')  } { Expand-JumperLink @Params;  break }
-        { $_ -in ('g',  'get')     } { Get-Jumper @Params;         break }
-        { $_ -in ('rd', 'read')    } { Read-JumperFile @Params;    break }
-        { $_ -in ('rt', 'restart') } { Restart-JumperModule;       break }
-        { $_ -in ('rv', 'resolve') } { Resolve-JumperList;         break }
-        { $_ -in ('s',  'set')     } { Set-JumperLink @Params;     break }
-        { $_ -in ('sh', 'history') } { Show-JumperHistory @Params; break }
-        { $_ -in ('sv', 'save')    } { Save-JumperList @Params;    break }
+        { $_ -in ('a',  'add')     } { Add-Jumper @ParamsOut;         break }
+        { $_ -in ('c',  'clear')   } { Clear-Jumper;                  break }
+        { $_ -in ('d',  'disable') } { Disable-JumperLink @ParamsOut; break }
+        { $_ -in ('e',  'expand')  } { Expand-JumperLink @ParamsOut;  break }
+        { $_ -in ('g',  'get')     } { Get-Jumper @ParamsOut;         break }
+        { $_ -in ('rd', 'read')    } { Read-JumperFile @ParamsOut;    break }
+        { $_ -in ('rt', 'restart') } { Restart-JumperModule;          break }
+        { $_ -in ('rv', 'resolve') } { Resolve-JumperList;            break }
+        { $_ -in ('s',  'set')     } { Set-JumperLink @ParamsOut;     break }
+        { $_ -in ('sh', 'history') } { Show-JumperHistory @ParamsOut; break }
+        { $_ -in ('sv', 'save')    } { Save-JumperList @ParamsOut;    break }
 
         { $_ -in ('h', 'Help') } {
         help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break
@@ -436,8 +444,9 @@ function Invoke-JumperCommand {
 
         default {
             println "Command: `e[33m", $Command, $RC
-            "Unbound arguments:"
-            $Params
+            "`$ParamsOut:`e[33m"
+            $ParamsOut
+            "`e[0m---"
         }
     }
 }
