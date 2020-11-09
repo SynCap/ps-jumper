@@ -149,6 +149,12 @@ function Read-JumperFile {
         [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
 
+    # println "      Direct `$Path : `e[33m" , $Path              , $RC
+    # println "     Direct `$Clear : `e[33m" , $Clear             , $RC
+    # println "             `$Args : `e[33m" , $Args              , $RC
+    # println "`$PSBoundParameters : `e[33m" , $PSBoundParameters , $RC
+    # $PSBoundParameters | Format-List *
+
     if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
         $Path = $tp
     } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
