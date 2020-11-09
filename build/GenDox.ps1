@@ -1,20 +1,21 @@
+$ModuleName = 'Jumper'
+$DocsFolder = Join-Path $PSScriptRoot '..\Docs' -Resolve
+$HelpFileFolder = Join-Path $DocsFolder '..' -Resolve
+
 Import-Module platyps
+Import-Module $ModuleName -Force
 
-Import-Module Jumper -Force
-
-$OutputFolder = Join-Path $PSScriptRoot '..\Docs' -Resolve -Force
 $parameters = @{
-    Module = 'Jumper'
-    OutputFolder = $OutputFolder
+    Module = $ModuleName
+    OutputFolder = $DocsFolder
     AlphabeticParamsOrder = $true
     WithModulePage = $true
     ExcludeDontShow = $true
-    Encoding = 'UTF8BOM'
+    # Encoding = 'UTF8BOM'
 }
 New-MarkdownHelp @parameters
+New-MarkdownAboutHelp -OutputFolder $DocsFolder -AboutName "about_$ModuleName"
 
-New-MarkdownAboutHelp -OutputFolder $OutputFolder -AboutName 'about_Jumper'
-
-# New-ExternalHelp –Path <folder with MDs> -OutputPath <output help folder>
-# Get-HelpPreview -Path "<ModuleName>-Help.xml"
+# New-ExternalHelp –Path $DocsFolder -OutputPath $HelpFileFolder
+# Get-HelpPreview -Path "$ModuleName-Help.xml"
 
