@@ -450,7 +450,7 @@ function Invoke-JumperCommand {
         { $_ -in ( 'set', 's'           ) } { Set-JumperLink @ParamsOut;     break }
 
         { $_ -in ('h', 'Help') } {
-        help Jumper; break
+            Get-Help Jumper|Sort-Object Name|Format-Table Name,Synopsis
         }
 
         default {
