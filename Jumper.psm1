@@ -113,7 +113,8 @@
 ############################# Data
 $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-$Script:DataDir = Join-Path $PSScriptRoot 'data'
+$Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
+$Script:DefaultDataFile = 'jumper.json'
 $RC = "`e[0m" # Reset Console
 
 ############################# Helper functions
@@ -145,7 +146,7 @@ function Read-JumperFile {
 
     # [CmdletBinding(SupportsShouldProcess)]
     param (
-        [Parameter(position = 0)] $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
+        [Parameter(position = 0)] $Path = ( Join-Path $Script:JumperDataDir $Script:DefaultDataFile ),
         [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
 
@@ -155,11 +156,11 @@ function Read-JumperFile {
     # println "`$PSBoundParameters : `e[33m" , $PSBoundParameters , $RC
     # $PSBoundParameters | Format-List *
 
-    if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
+    if (Test-Path ($tp = Join-Path $Script:JumperDataDir $Path)) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.json")) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.ini")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.ini")) {
         $Path = $tp
     } if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path${RC} not found"
@@ -264,10 +265,10 @@ function Save-JumperList {
         Save current Jumper Links List to the file
     #>
     Param (
-        $Path = (Join-Path $Script:DataDir 'jumper.json')
+        $Path = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
     )
-    if ($Path -notmatch '\\') { $Path = Join-Path $Script:DataDir $Path }
-    if ($Path -notmatch '\.') { $Path += '.json' }
+    if ($Path -notmatch '\\') { $Path = Join-Path $Script:JumperDataDir $Path }
+    if ($Path -notmatch '\.json$') { $Path += '.json' }
 
     Write-Verbose $Path
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
