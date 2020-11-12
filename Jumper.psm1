@@ -493,7 +493,7 @@ function Invoke-JumperCommand {
     Set-Alias svjr  -Value Save-JumperList      -Description 'Save current Jumper Links List to the file'
 
     Set-Alias jr    -Value Invoke-JumperCommand -Description 'Main command centre of module'
-    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
+    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~.'
 
 ############################## Initialisation, Read default Data
 
