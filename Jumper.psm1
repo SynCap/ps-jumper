@@ -436,20 +436,20 @@ function Invoke-JumperCommand {
 
     switch ($Command) {
 
-        { $_ -in ('a',  'add')     } { Add-Jumper @ParamsOut;         break }
-        { $_ -in ('c',  'clear')   } { Clear-Jumper;                  break }
-        { $_ -in ('d',  'disable') } { Disable-JumperLink @ParamsOut; break }
-        { $_ -in ('e',  'expand')  } { Expand-JumperLink @ParamsOut;  break }
-        { $_ -in ('g',  'get')     } { Get-Jumper @ParamsOut;         break }
-        { $_ -in ('rd', 'read')    } { Read-JumperFile @ParamsOut;    break }
-        { $_ -in ('rt', 'restart') } { Restart-JumperModule;          break }
-        { $_ -in ('rv', 'resolve') } { Resolve-JumperList;            break }
-        { $_ -in ('s',  'set')     } { Set-JumperLink @ParamsOut;     break }
-        { $_ -in ('sh', 'history') } { Show-JumperHistory @ParamsOut; break }
-        { $_ -in ('sv', 'save')    } { Save-JumperList @ParamsOut;    break }
+        { $_ -in ( 'add', 'a'           ) } { Add-Jumper @ParamsOut;         break }
+        { $_ -in ( 'clear', 'c'         ) } { Clear-Jumper;                  break }
+        { $_ -in ( 'disable', 'd', 'rm' ) } { Disable-JumperLink @ParamsOut; break }
+        { $_ -in ( 'expand', 'e'        ) } { Expand-JumperLink @ParamsOut;  break }
+        { $_ -in ( 'get', 'g'           ) } { Get-Jumper @ParamsOut;         break }
+        { $_ -in ( 'history', 'sh'      ) } { Show-JumperHistory @ParamsOut; break }
+        { $_ -in ( 'read', 'rd'         ) } { Read-JumperFile @ParamsOut;    break }
+        { $_ -in ( 'resolve', 'rv'      ) } { Resolve-JumperList;            break }
+        { $_ -in ( 'restart', 'rt'      ) } { Restart-JumperModule;          break }
+        { $_ -in ( 'save', 'sv'         ) } { Save-JumperList @ParamsOut;    break }
+        { $_ -in ( 'set', 's'           ) } { Set-JumperLink @ParamsOut;     break }
 
         { $_ -in ('h', 'Help') } {
-        help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break
+        help Jumper; break
         }
 
         default {
