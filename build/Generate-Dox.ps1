@@ -16,6 +16,6 @@ $parameters = @{
 New-MarkdownHelp @parameters
 New-MarkdownAboutHelp -OutputFolder $DocsFolder -AboutName "about_$ModuleName"
 
-# New-ExternalHelp –Path $DocsFolder -OutputPath $HelpFileFolder
-# Get-HelpPreview -Path "$ModuleName-Help.xml"
+New-ExternalHelp –Path $DocsFolder -OutputPath $HelpFileFolder
+Get-HelpPreview -Path "$ModuleName-Help.xml"
 
