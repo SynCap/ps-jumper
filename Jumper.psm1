@@ -399,25 +399,25 @@ function Invoke-JumperCommand {
         .synopsis
             Main command centre of module
 
-        .Description.
+        .Description
             Allow to launch Jumper commands in unified manner like a single cmdlet or app.
 
             Registered commands:
 
                 go            Jump to target using label and added path or get the resolved path.
 
-                add           Add label to jumper list:
+                 a | add      Add label to jumper list:
                                  jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                c  | clear    Clear jumper label list
-                d  | disable  Remove record from jumper label list by label: jr disable <Label>
-                e  | expand   Expand path variables and evaluate expressions in value of jumper link
-                g  | get      Get full or filtered jumper link list: jr get [match_mask]
-                rd | history  Show session history of jumps
-                rt | read     Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
+                 c | clear    Clear jumper label list
+            rm | d | disable  Remove record from jumper label list by label: jr disable <Label>
+                 e | expand   Expand path variables and evaluate expressions in value of jumper link
+                 g | get      Get full or filtered jumper link list: jr get [match_mask]
+                sh | history  Show session history of jumps
+                rd | read     Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
                 rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
-                s  | restart  Try to reload module itself
-                sh | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
-                sv | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                rt | restart  Try to reload module itself
+                sv | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
+                 s | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
 
     #>
 
