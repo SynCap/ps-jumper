@@ -297,7 +297,7 @@ function Expand-JumperLink {
     )
     Process {
         if ($Label -in $Script:Jumper.Keys -and '=' -eq $Script:Jumper[$Label][0]) {
-            & $Script:Jumper[$Label].Substring(1)
+            Invoke-Expression $Script:Jumper[$Label].Substring(1)
         }
         else {
             [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label]) | exps
