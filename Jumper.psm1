@@ -439,8 +439,9 @@ function Invoke-JumperCommand {
         [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $ParamsIn
     )
 
+    println "Command centre params:"
+    println "Command: ",$Command
     if ($ParamsIn) {
-        println "Comad centre params:"
         $ParamsIn | ForEach-Object {
             println "`t`e[33m",$_,$RC
         }
