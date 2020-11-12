@@ -119,8 +119,14 @@ $RC = "`e[0m" # Reset Console
 
 ############################# Helper functions
 function local:hr($Ch = '-', $Cnt = 0 -bor [Console]::WindowWidth / 2) { $Ch * $Cnt }
-function local:print([Parameter(ValueFromPipeline)][String[]]$Params) { [System.Console]::Write($Params -join '') }
-function local:println([Parameter(ValueFromPipeline)][String[]]$Params) { [System.Console]::WriteLine($Params -join '') }
+
+function local:print([Parameter(ValueFromPipeline)][String[]]$Params) {
+    [System.Console]::Write($Params -join '')
+}
+
+function local:println([Parameter(ValueFromPipeline)][String[]]$Params) {
+    [System.Console]::WriteLine($Params -join '')
+}
 
 function local:spf ([parameter(ValueFromPipeline, position = 0)][string] $ShFName) {
     try {
@@ -174,19 +180,22 @@ function Read-JumperFile {
     };
 
     if ($Clear) { $Script:Jumper.Clear() }
-    ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | ForEach-Object {
-        foreach ($key in $_.Keys) {
-            if ($Script:Jumper.ContainsKey($key)) {
-                println "`e[33m",
-                        "Link conflict: label`e[91m $key`e[33m already exists", $RC
-                println "       Exists: `e[36m", $Script:Jumper[$key], $RC
-                println "  Want to add: `e[96m", $_[$key], $RC
-            }
-            else {
-                $Script:Jumper.($key) = $_.($key)
+
+    ( ('json' -ieq ($Path.Split('.')[-1])) ?
+        (ReadFromJson($Path)) :
+        (ReadFromText($Path)) ) | ForEach-Object {
+            foreach ($key in $_.Keys) {
+                if ($Script:Jumper.ContainsKey($key)) {
+                    println "`e[33m",
+                            "Link conflict: label`e[91m $key`e[33m already exists", $RC
+                    println "       Exists: `e[36m", $Script:Jumper[$key], $RC
+                    println "  Want to add: `e[96m", $_[$key], $RC
+                }
+                else {
+                    $Script:Jumper.($key) = $_.($key)
+                }
             }
         }
-    }
 
     Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Script:Jumper.Count )
 }
@@ -198,7 +207,10 @@ function Get-Jumper($Filter, [Alias('w')][switch]$Wide) {
     #>
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
         ForEach-Object -Begin {$SNo = 1} -Process {
-            [PSCustomObject]@{ '###' = $SNo; 'Label' = $_.Name; 'Link' = "`e[32m$($_.Value)${RC}"; 'Target' = Expand-JumperLink $_.Name }
+            [PSCustomObject]@{ '###' = $SNo;
+            'Label' = $_.Name;
+            'Link' = "`e[32m$($_.Value)${RC}";
+            'Target' = Expand-JumperLink $_.Name }
             $SNo++
         }
 }
