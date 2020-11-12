@@ -380,6 +380,10 @@ function Use-Jumper {
 }
 
 function Restart-JumperModule {
+    <#
+        .synopsis
+            Try to force reload the Jumper module itself.
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     Param(
     )
