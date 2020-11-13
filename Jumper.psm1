@@ -458,12 +458,11 @@ function Invoke-JumperCommand {
         { $_ -in ( 'Help', 'h'          ) } { Get-JumperHel;                 break }
 
         default {
-            println "Command: `e[33m", $Command, $RC
-            "`$ParamsOut:`e[33m"
-            $ParamsIn | ForEach-Object {
-                println "`t`e[33m",$_,$RC
-            }
+            $Params
             "`e[0m---"
+            $PSBoundParameters
+            "`e[0m---"
+            $Args
         }
     }
 }
