@@ -407,6 +407,10 @@ function Restart-JumperModule {
     Import-Module $ModuleName -Force -Verbose:$Verbose
 }
 
+function Get-JumperHelp {
+    Get-Help Jumper|Sort-Object Name|Format-Table Name,Synopsis
+}
+
 function Invoke-JumperCommand {
     <#
         .synopsis
@@ -442,21 +446,18 @@ function Invoke-JumperCommand {
 
     switch ($Command) {
 
-        { $_ -in ( 'add', 'a'           ) } { Add-Jumper @ParamsOut;         break }
-        { $_ -in ( 'clear', 'c'         ) } { Clear-Jumper;                  break }
-        { $_ -in ( 'disable', 'd', 'rm' ) } { Disable-JumperLink @ParamsOut; break }
-        { $_ -in ( 'expand', 'e'        ) } { Expand-JumperLink @ParamsOut;  break }
-        { $_ -in ( 'get', 'g'           ) } { Get-Jumper @ParamsOut;         break }
-        { $_ -in ( 'history', 'sh'      ) } { Show-JumperHistory @ParamsOut; break }
-        { $_ -in ( 'read', 'rd'         ) } { Read-JumperFile @ParamsOut;    break }
-        { $_ -in ( 'resolve', 'rv'      ) } { Resolve-JumperList;            break }
-        { $_ -in ( 'restart', 'rt'      ) } { Restart-JumperModule;          break }
-        { $_ -in ( 'save', 'sv'         ) } { Save-JumperList @ParamsOut;    break }
-        { $_ -in ( 'set', 's'           ) } { Set-JumperLink @ParamsOut;     break }
-
-        { $_ -in ('h', 'Help') } {
-            Get-Help Jumper|Sort-Object Name|Format-Table Name,Synopsis
-        }
+        { $_ -in ( 'Add', 'a'           ) } { Add-Jumper @ParamsOut;         break }
+        { $_ -in ( 'Clear', 'c'         ) } { Clear-Jumper;                  break }
+        { $_ -in ( 'Disable', 'd', 'rm' ) } { Disable-JumperLink @ParamsOut; break }
+        { $_ -in ( 'Expand', 'e'        ) } { Expand-JumperLink @ParamsOut;  break }
+        { $_ -in ( 'Get', 'g'           ) } { Get-Jumper @ParamsOut;         break }
+        { $_ -in ( 'History', 'sh'      ) } { Show-JumperHistory @ParamsOut; break }
+        { $_ -in ( 'Read', 'rd'         ) } { Read-JumperFile @ParamsOut;    break }
+        { $_ -in ( 'Resolve', 'rv'      ) } { Resolve-JumperList;            break }
+        { $_ -in ( 'Restart', 'rt'      ) } { Restart-JumperModule;          break }
+        { $_ -in ( 'Save', 'sv'         ) } { Save-JumperList @ParamsOut;    break }
+        { $_ -in ( 'Set', 's'           ) } { Set-JumperLink @ParamsOut;     break }
+        { $_ -in ( 'Help', 'h'          ) } { Get-JumperHel;                 break }
 
         default {
             println "Command: `e[33m", $Command, $RC
