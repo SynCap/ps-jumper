@@ -443,27 +443,22 @@ function Invoke-JumperCommand {
     )
 
     switch ($Command) {
-
-        { $_ -in ( 'Add', 'a'           ) } { Invoke-Expression Add-Jumper @Params;         break }
-        { $_ -in ( 'Clear', 'c'         ) } { Invoke-Expression Clear-Jumper;                  break }
-        { $_ -in ( 'Disable', 'd', 'rm' ) } { Invoke-Expression Disable-JumperLink @Params; break }
-        { $_ -in ( 'Expand', 'e'        ) } { Invoke-Expression Expand-JumperLink @Params;  break }
-        { $_ -in ( 'Get', 'g'           ) } { Invoke-Expression Get-Jumper @Params;         break }
-        { $_ -in ( 'History', 'sh'      ) } { Invoke-Expression Show-JumperHistory @Params; break }
-        { $_ -in ( 'Read', 'rd', 'load' ) } { Invoke-Expression Read-JumperFile @Params;    break }
-        { $_ -in ( 'Resolve', 'rv'      ) } { Invoke-Expression Resolve-JumperList;            break }
-        { $_ -in ( 'Restart', 'rt'      ) } { Invoke-Expression Restart-JumperModule;          break }
-        { $_ -in ( 'Save', 'sv'         ) } { Invoke-Expression Save-JumperList @Params;    break }
-        { $_ -in ( 'Set', 's'           ) } { Invoke-Expression Set-JumperLink @Params;     break }
-        { $_ -in ( 'Help', 'h'          ) } { Invoke-Expression Get-JumperHelp;                break }
-
-        default {
-            $Params
-            "`e[0m---"
-            $PSBoundParameters
-            "`e[0m---"
-            $Args
+        { $_ -in ( 'Add', 'a'           ) } { Add-Jumper @Params;         break }
+        { $_ -in ( 'Clear', 'c'         ) } { Clear-Jumper;               break }
+        { $_ -in ( 'Disable', 'd', 'rm' ) } { Disable-JumperLink @Params; break }
+        { $_ -in ( 'Expand', 'e'        ) } { Expand-JumperLink @Params;  break }
+        { $_ -in ( 'Get', 'g'           ) } { Get-Jumper @Params;         break }
+        { $_ -in ( 'History', 'sh'      ) } { Show-JumperHistory @Params; break }
+        { $_ -in ( 'Read', 'rd', 'load' ) } {
+            $Clear = '-c' -in $Params -or '-Clear' -in $Params;
+            Read-JumperFile $Params[0] -Clear:$Clear;
+            break
         }
+        { $_ -in ( 'Resolve', 'rv' ) } { Resolve-JumperList;      break }
+        { $_ -in ( 'Restart', 'rt' ) } { Restart-JumperModule;    break }
+        { $_ -in ( 'Save', 'sv'    ) } { Save-JumperList @Params; break }
+        { $_ -in ( 'Set', 's'      ) } { Set-JumperLink @Params;  break }
+        { $_ -in ( 'Help', 'h'     ) } { Get-JumperHelp;          break }
     }
 }
 
