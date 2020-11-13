@@ -439,7 +439,7 @@ function Invoke-JumperCommand {
 
     param(
         [Parameter(position = 0)] [String] $Command = 'Help',
-        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $ParamsIn
+        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
     )
 
     $ParamsOut = $ParamsIn # todo: ParamsOut должен стать Hashtable
