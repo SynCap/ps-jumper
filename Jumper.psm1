@@ -113,13 +113,20 @@
 ############################# Data
 $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-$Script:DataDir = Join-Path $PSScriptRoot 'data'
+$Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
+$Script:DefaultDataFile = 'jumper.json'
 $RC = "`e[0m" # Reset Console
 
 ############################# Helper functions
 function local:hr($Ch = '-', $Cnt = 0 -bor [Console]::WindowWidth / 2) { $Ch * $Cnt }
-function local:print([Parameter(ValueFromPipeline)][String[]]$Params) { [System.Console]::Write($Params -join '') }
-function local:println([Parameter(ValueFromPipeline)][String[]]$Params) { [System.Console]::WriteLine($Params -join '') }
+
+function local:print([Parameter(ValueFromPipeline)][String[]]$Params) {
+    [System.Console]::Write($Params -join '')
+}
+
+function local:println([Parameter(ValueFromPipeline)][String[]]$Params) {
+    [System.Console]::WriteLine($Params -join '')
+}
 
 function local:spf ([parameter(ValueFromPipeline, position = 0)][string] $ShFName) {
     try {
@@ -142,41 +149,54 @@ function Read-JumperFile {
     .synopsis
         Set or enhance jumper label list from JSON or text (INI) file
     #>
+
+    # [CmdletBinding(SupportsShouldProcess)]
     param (
-        $Path = ( Join-Path $Script:DataDir 'jumper.json' ),
-        [Alias('c')] [Switch] $Clear
+        [Parameter(position = 0)] $Path = ( Join-Path $Script:JumperDataDir $Script:DefaultDataFile ),
+        [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
-    if (Test-Path ($tp = Join-Path $Script:DataDir $Path)) {
+
+    # println "      Direct `$Path : `e[33m" , $Path              , $RC
+    # println "     Direct `$Clear : `e[33m" , $Clear             , $RC
+    # println "             `$Args : `e[33m" , $Args              , $RC
+    # println "`$PSBoundParameters : `e[33m" , $PSBoundParameters , $RC
+    # $PSBoundParameters | Format-List *
+
+    if (Test-Path ($tp = Join-Path $Script:JumperDataDir $Path)) {
         $Path = $tp
-    }
-    elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.json")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.json")) {
         $Path = $tp
-    }
-    elseif (Test-Path ($tp = Join-Path $Script:DataDir "$Path.ini")) {
+    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.ini")) {
         $Path = $tp
-    }
-    if (!(Test-Path $Path)) {
+    } if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path${RC} not found"
         return
     }
+
     function ReadFromJson($JsonPath) { Get-Content $JsonPath | ConvertFrom-Json -AsHashtable };
     function ReadFromText($TextPath) {
         $Out = @{}; Get-Content $TextPath |
             ConvertFrom-StringData | ForEach-Object { $Out += $_ }; $Out
     };
+
     if ($Clear) { $Script:Jumper.Clear() }
-    ( ('json' -ieq ($Path.Split('.')[-1])) ? (ReadFromJson($Path)) : (ReadFromText($Path)) ) | ForEach-Object {
-        foreach ($key in $_.Keys) {
-            if ($Script:Jumper.ContainsKey($key)) {
-                println "`e[31mConflicting data: label`e[91m $key`e[31m already exists", $RC
-                println "Existing value: `e[36m", $Script:Jumper[$key], $RC
-                println "New value: `e[96m", $_[$key], $RC
-            }
-            else {
-                $Script:Jumper.($key) = $_.($key)
+
+    ( ('json' -ieq ($Path.Split('.')[-1])) ?
+        (ReadFromJson($Path)) :
+        (ReadFromText($Path)) ) | ForEach-Object {
+            foreach ($key in $_.Keys) {
+                if ($Script:Jumper.ContainsKey($key)) {
+                    println "`e[33m",
+                            "Link conflict: label`e[91m $key`e[33m already exists", $RC
+                    println "       Exists: `e[36m", $Script:Jumper[$key], $RC
+                    println "  Want to add: `e[96m", $_[$key], $RC
+                }
+                else {
+                    $Script:Jumper.($key) = $_.($key)
+                }
             }
         }
-    }
+
     Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Script:Jumper.Count )
 }
 
@@ -186,9 +206,11 @@ function Get-Jumper($Filter, [Alias('w')][switch]$Wide) {
         Get full or filtered jumper link list
     #>
     $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
-        ForEach-Object {
-            $SNo = 1
-            [PSCustomObject]@{ '###' = $SNo; 'Label' = $_.Name; 'Link' = "`e[32m$($_.Value)${RC}"; 'Target' = Expand-JumperLink $_.Name }
+        ForEach-Object -Begin {$SNo = 1} -Process {
+            [PSCustomObject]@{ '###' = $SNo;
+            'Label' = $_.Name;
+            'Link' = "`e[32m$($_.Value)${RC}";
+            'Target' = Expand-JumperLink $_.Name }
             $SNo++
         }
 }
@@ -200,8 +222,7 @@ function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
     #>
     if ($Script:JumperHistory.Count) { hr } else { "`e[33mNo Jumper history yet${RC}"; return; }
     ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
-        ForEach-Object {
-            $Index = 1
+        ForEach-Object -Begin {$Index = 1} -Process {
             println "`e[32m", $Index, ". ", $RC, $_
             $index++
         }
@@ -256,10 +277,10 @@ function Save-JumperList {
         Save current Jumper Links List to the file
     #>
     Param (
-        $Path = (Join-Path $Script:DataDir 'jumper.json')
+        $Path = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
     )
-    if ($Path -notmatch '\\') { $Path = Join-Path $Script:DataDir $Path }
-    if ($Path -notmatch '\.') { $Path += '.json' }
+    if ($Path -notmatch '\\') { $Path = Join-Path $Script:JumperDataDir $Path }
+    if ($Path -notmatch '\.json$') { $Path += '.json' }
 
     Write-Verbose $Path
     ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
@@ -372,6 +393,10 @@ function Use-Jumper {
 }
 
 function Restart-JumperModule {
+    <#
+        .synopsis
+            Try to force reload the Jumper module itself.
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     Param(
     )
@@ -382,31 +407,34 @@ function Restart-JumperModule {
     Import-Module $ModuleName -Force -Verbose:$Verbose
 }
 
+function Get-JumperHelp {
+    Get-Help Jumper|Sort-Object Name|Format-Table Name,Synopsis
+}
+
 function Invoke-JumperCommand {
     <#
         .synopsis
             Main command centre of module
 
-        .Description.
+        .Description
             Allow to launch Jumper commands in unified manner like a single cmdlet or app.
 
             Registered commands:
 
-                go         Jump to target using label and added path or get the resolved path.
+                go            Jump to target using label and added path or get the resolved path.
 
-                add        Add label to jumper list:
-                              jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                clear      Clear jumper label list
-                disable    Remove record from jumper label list by label: jr disable <Label>
-                expand     Expand path variables and evaluate expressions in value of jumper link
-                get        Get full or filtered jumper link list: jr get [match_mask]
-                history    Show session history of jumps
-                read       Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
-                resolve    Expand all links in list. May be need for further save a file with list of all link targets expanded
-                restart    Try to reload module itself
-                set        Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                save       Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
-
+                 a | add      Add label to jumper list:
+                                 jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                 c | clear    Clear jumper label list
+            rm | d | disable  Remove record from jumper label list by label: jr disable <Label>
+                 e | expand   Expand path variables and evaluate expressions in value of jumper link
+                 g | get      Get full or filtered jumper link list: jr get [match_mask]
+                sh | history  Show session history of jumps
+                rd | read     Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
+                rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
+                rt | restart  Try to reload module itself
+                sv | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
+                 s | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
     #>
 
     param(
@@ -415,28 +443,22 @@ function Invoke-JumperCommand {
     )
 
     switch ($Command) {
-
-        { $_ -in ('a', 'add')      } { Add-Jumper @Params;         break }
-        { $_ -in ('c', 'clear')    } { Clear-Jumper;               break }
-        { $_ -in ('d', 'disable')  } { Disable-JumperLink @Params; break }
-        { $_ -in ('e', 'expand')   } { Expand-JumperLink @Params;  break }
-        { $_ -in ('g', 'get')      } { Get-Jumper @Params;         break }
-        { $_ -in ('rd', 'read')    } { Read-JumperFile @Params;    break }
-        { $_ -in ('rt', 'restart') } { Restart-JumperModule;       break }
-        { $_ -in ('rv', 'resolve') } { Resolve-JumperList;         break }
-        { $_ -in ('s', 'set')      } { Set-JumperLink @Params;     break }
-        { $_ -in ('sh, history')   } { Show-JumperHistory @Params; break }
-        { $_ -in ('sv', 'save')    } { Save-JumperList @Params;    break }
-
-        { $_ -in ('h', 'Help') } {
-            help (Split-Path (g . '.\Jumper.psm1') -LeafBase); break
+        { $_ -in ( 'Add', 'a'           ) } { Add-Jumper @Params;         break }
+        { $_ -in ( 'Clear', 'c'         ) } { Clear-Jumper;               break }
+        { $_ -in ( 'Disable', 'd', 'rm' ) } { Disable-JumperLink @Params; break }
+        { $_ -in ( 'Expand', 'e'        ) } { Expand-JumperLink @Params;  break }
+        { $_ -in ( 'Get', 'g'           ) } { Get-Jumper @Params;         break }
+        { $_ -in ( 'History', 'sh'      ) } { Show-JumperHistory @Params; break }
+        { $_ -in ( 'Read', 'rd', 'load' ) } {
+            $Clear = '-c' -in $Params -or '-Clear' -in $Params;
+            Read-JumperFile $Params[0] -Clear:$Clear;
+            break
         }
-
-        default {
-            println "Command: `e[33m", $Command, $RC
-            "Unbound arguments:"
-            $Params
-        }
+        { $_ -in ( 'Resolve', 'rv' ) } { Resolve-JumperList;      break }
+        { $_ -in ( 'Restart', 'rt' ) } { Restart-JumperModule;    break }
+        { $_ -in ( 'Save', 'sv'    ) } { Save-JumperList @Params; break }
+        { $_ -in ( 'Set', 's'      ) } { Set-JumperLink @Params;  break }
+        { $_ -in ( 'Help', 'h'     ) } { Get-JumperHelp;          break }
     }
 }
 
@@ -458,7 +480,7 @@ function Invoke-JumperCommand {
     Set-Alias svjr  -Value Save-JumperList      -Description 'Save current Jumper Links List to the file'
 
     Set-Alias jr    -Value Invoke-JumperCommand -Description 'Main command centre of module'
-    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~. By reason could be J but `J` key on keyboard already very buisy but poor 😥'
+    Set-Alias g     -Value ~                    -Description 'Abbr for GO or GET, the clone of ~.'
 
 ############################## Initialisation, Read default Data
 
