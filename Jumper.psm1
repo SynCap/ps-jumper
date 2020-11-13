@@ -431,7 +431,6 @@ function Invoke-JumperCommand {
                 rt | restart  Try to reload module itself
                 sv | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
                  s | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-
     #>
 
     param(
@@ -439,13 +438,6 @@ function Invoke-JumperCommand {
         [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $ParamsIn
     )
 
-    println "Command centre params:"
-    println "Command: ",$Command
-    if ($ParamsIn) {
-        $ParamsIn | ForEach-Object {
-            println "`t`e[33m",$_,$RC
-        }
-    }
     $ParamsOut = $ParamsIn # todo: ParamsOut должен стать Hashtable
 
     switch ($Command) {
@@ -469,7 +461,9 @@ function Invoke-JumperCommand {
         default {
             println "Command: `e[33m", $Command, $RC
             "`$ParamsOut:`e[33m"
-            $ParamsOut
+            $ParamsIn | ForEach-Object {
+                println "`t`e[33m",$_,$RC
+            }
             "`e[0m---"
         }
     }
