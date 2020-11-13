@@ -442,8 +442,6 @@ function Invoke-JumperCommand {
         [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
     )
 
-    $ParamsOut = $ParamsIn # todo: ParamsOut должен стать Hashtable
-
     switch ($Command) {
 
         { $_ -in ( 'Add', 'a'           ) } { Add-Jumper @ParamsOut;         break }
