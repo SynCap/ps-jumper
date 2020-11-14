@@ -417,7 +417,7 @@ function Invoke-JumperCommand {
             Main command centre of module
 
         .Description
-            Allow to launch Jumper commands in unified manner like a single cmdlet or app.
+            Launch Jumper commands.
 
             Registered commands:
 
