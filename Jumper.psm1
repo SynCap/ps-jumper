@@ -371,6 +371,12 @@ function Use-Jumper {
             break;
         }
 
+        { $expandedLabel = [System.Environment]::ExpandEnvironmentVariables($Label); Test-Path $expandedLabel}{
+            $Target = Resolve-Path $expandedLabel;
+            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
+            break;
+        }
+
         default {
             $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
             "Target will be set to the current location: `e[33m", $PWD, $RC
