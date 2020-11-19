@@ -6,17 +6,12 @@ Import-Module platyps
 Import-Module $ModuleName -Force
 
 $parameters = @{
-    # Encoding = 'UTF8BOM'
-    AlphabeticParamsOrder = $true
-    ExcludeDontShow = $true
-    LogPath = $HelpFileFolder
-    Module = $ModuleName
-    OutputFolder = $DocsFolder
+    Path = $DocsFolder
     RefreshModulePage = $true
+    AlphabeticParamsOrder = $true
     UpdateInputOutput = $true
-    WithModulePage = $true
+    ExcludeDontShow = $true
+    LogPath = Join-Path $DocsFolder 'logs'
+    Encoding = 'UTF8BOM'
 }
 Update-MarkdownHelpModule @parameters
-
-# New-ExternalHelp –Path $DocsFolder -OutputPath $HelpFileFolder
-# Get-HelpPreview -Path "$ModuleName-Help.xml"
