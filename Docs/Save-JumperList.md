@@ -13,7 +13,7 @@ Save current Jumper Links List to the file
 ## SYNTAX
 
 ```
-Save-JumperList [[-Path] <Object>]
+Save-JumperList [[-Path] <Object>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -44,6 +44,9 @@ Default value: (Join-Path $Script:DataDir 'jumper.json')
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+
+### CommonParameters
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

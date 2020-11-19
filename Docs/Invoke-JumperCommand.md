@@ -34,7 +34,7 @@ May be need for further save a file with list of all link targets expanded
 ## SYNTAX
 
 ```
-Invoke-JumperCommand [[-Command] <String>] [[-ParamsIn] <String[]>] [<CommonParameters>]
+Invoke-JumperCommand [[-Command] <String>] [[-Params] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -66,8 +66,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ParamsIn
-{{ Fill ParamsIn Description }}
+### -Params
+{{ Fill Params Description }}
 
 ```yaml
 Type: String[]
