@@ -329,6 +329,55 @@ function Use-Jumper {
     <#
     .synopsis
         Jump to target using label and added path or get the resolved path
+    .Description
+        Provides the main functionality by making transit or getting the complex long path
+        just by short alias. Initially provided 2 aliases for this function: `~` and `g` (abbreviation
+        of Get or Go). Also provided default link alias `~` for user's home dir (%UserProfile%, ussually `C:\Users\<UserName>\`),
+        so to jump to profile home dir just use `~` command. `~ ~` or `g ~` do the same.
+
+        In addition Jumper have its own history of jumps and one more "magic" label -- `-` (minus sign) which mean to jump to location
+        last in history of transitions made using `Use-Jumper`. So `~ -` is an analogue of "Back button" in the browsers.
+
+        `Use-Jumper` automatically evaluates the pathes of system folders such as `My Documents`, `Application Data`, and so on. To see
+        what aliases are valid for those folders use `Get-ShellPredefinedFolder` function.
+
+        If first positional parameter or parameter `-Path` is a string or path of real location then `Use-Jumper` use it as a result of
+        evaluations and can jump to it. Such way may replace original `Set-Location` and in addition save this transit in jump history.
+        (see Show-JumperHistory help). Path can contain valid environment variables expanded automatically.
+
+        `Use-Jumper` automatically jumps when only one parameter provided and just return evaluated path if provided second positional
+        parameter which automatically joins to evaluated label.
+
+        To force transit use `-f` (`-Force`) switch. To force return the expanded path use `-s` (`-AsString`) switch.
+
+    .Example
+
+        Jump by label:
+
+            g lbl
+    .Example
+
+        Correspond to full path by label:
+
+            ls (g lbl .)
+
+        Here dot represent a part of path, that will be joined to path evaluated by label. Same result can be recived with:
+
+            ls (g lbl -s)
+
+        Where we force return of string value without jump.
+
+    .Example
+
+        Jump to Programs folder of Windows Start Button Menu:
+
+            g programs
+
+    .Example
+
+        Jump using environment variable:
+
+            g %appdata%
     #>
     param (
         [Parameter(position = 0)] $Label = '~',
