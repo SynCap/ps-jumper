@@ -408,19 +408,15 @@ function Use-Jumper {
 
         { [bool]$Script:Jumper[$Label] } {
             $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Script:Jumper[$Label], $RC
-            $Target = $Path ?
-            (Join-Path (Expand-JumperLink $Label) $Path -Resolve) :
-            (Expand-JumperLink $Label)
+            $Target = Expand-JumperLink $Label
             break;
         }
 
-        { $Label -in [System.Environment+SpecialFolder].GetEnumNames() } {
-            $Target = spf $Label;
-            $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} presented.",
+        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($TestPath = [Environment]::GetFolderPath($Label)))} {
+            $Target = $TestPath
+            $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
-            if (Test-Path $Target) {
-                break;
-            }
+            break;
         }
 
         { Test-Path $Label } {
@@ -429,8 +425,8 @@ function Use-Jumper {
             break;
         }
 
-        { $expandedLabel = [System.Environment]::ExpandEnvironmentVariables($Label); Test-Path $expandedLabel}{
-            $Target = Resolve-Path $expandedLabel;
+        { Test-Path ($TestPath = [System.Environment]::ExpandEnvironmentVariables($Label))}{
+            $Target = [System.Environment]::ExpandEnvironmentVariables($Label)
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
@@ -438,8 +434,15 @@ function Use-Jumper {
         default {
             $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
             "Target will be set to the current location: `e[33m", $PWD, $RC
-            $Target = $PWD
         }
+    }
+
+    if ($null -ne $Target) {
+        if ($Path) {
+            $Target = Join-Path $Target $Path -Resolve
+        }
+    } else {
+        $Target = $PWD
     }
 
     $Force = $Force -or (('' -eq $Path) -and !$Force)
