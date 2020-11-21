@@ -131,7 +131,7 @@
   "totcmd": "%ProgramFiles%\\totalcmd",
   "trvlt": "%JOB%\\_Test\\Travolta\\trvlt.dev",
   "u20": "%LocalAppData%\\Packages\\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\\LocalState\\rootfs\\home\\closk",
-  "ubuntu": "%LocalAppData%\\Packages\\CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc\\LocalState\\rootfs\\home\\closk",
+  "ubuntu": "%LocalAppData%\\Packages\\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\\LocalState\\rootfs\\home\\closk",
   "updates": "%windir%\\SoftwareDistribution\\Download",
   "user": "%UserProfile%",
   "vue": "%JOB%\\JS\\Vue",
