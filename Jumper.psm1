@@ -116,30 +116,39 @@ $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
 $Script:DefaultDataFile = 'jumper.json'
 $RC = "`e[0m" # Reset Console
+$Script:JumperSPF = @{}
 
 ############################# Helper functions
-function local:hr($Ch = '-', $Cnt = 0 -bor [Console]::WindowWidth / 2) { $Ch * $Cnt }
+function Script:hr($Ch = '-', $Cnt = 0 -bor [Console]::WindowWidth / 2) { $Ch * $Cnt }
 
-function local:print([Parameter(ValueFromPipeline)][String[]]$Params) {
+function Script:print([Parameter(ValueFromPipeline)][String[]]$Params) {
     [System.Console]::Write($Params -join '')
 }
 
-function local:println([Parameter(ValueFromPipeline)][String[]]$Params) {
+function Script:println([Parameter(ValueFromPipeline)][String[]]$Params) {
     [System.Console]::WriteLine($Params -join '')
 }
 
-function local:spf ([parameter(ValueFromPipeline, position = 0)][string] $ShFName) {
-    try {
-        [Environment]::GetFolderPath($ShFName)
-    }
-    catch {
-        $ShFName
+function Get-ShellPredefinedFolder ([parameter(ValueFromPipeline,ValueFromPipelineByPropertyName,position = 0)][string] $SpecialFolderAlias) {
+    if ([Enum]::GetNames([System.Environment+SpecialFolder]) -contains $SpecialFolderAlias) {
+        [Environment]::GetFolderPath($SpecialFolderAlias)
+    } else {
+        if (1 -gt $Script:JumperSPF.Count) {
+            [Enum]::GetNames([System.Environment+SpecialFolder]).GetEnumerator().forEach({
+                $path = [Environment]::GetFolderPath($_)
+                if (0 -lt $path.Length) {
+                    $Script:JumperSPF.Add($_, $path)
+                }
+            })
+        }
+        $Script:JumperSPF.GetEnumerator() | Select-Object Name,Value | Sort-Object Name | Where-Object Name -match $SpecialFolderAlias
     }
 }
+Set-Alias spf -Value Get-ShellPredefinedFolder
 
-function local:exps ([parameter(ValueFromPipeline)][string]$s) {
+function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
     $re = '#\(\s*(\w+?)\s*\)'
-    $s -replace $re, { $_.Groups[1].Value | spf }
+    $s -replace $re, { Get-ShellPredefinedFolder $_.Groups[1].Value }
 }
 
 ############################# Module Core
