@@ -222,19 +222,30 @@ function Read-JumperFile {
     Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Script:Jumper.Count )
 }
 
-function Get-Jumper($Filter, [Alias('w')][switch]$Wide) {
+function Get-Jumper {
     <#
     .synopsis
         Get full or filtered jumper link list
     #>
-    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $filter } | Sort-Object Name |
+    param (
+        # Filter registerd links by partial case insensetive match
+        [String] $Filter,
+        # Evaluate and show targets
+        [Alias('t')][Switch] $ShowTargets,
+        # Filter by Links too
+        [Alias('l')][Switch] $ByLink
+    )
+    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $Filter -or ($ByLink -and $_.Value -imatch $Filter) } | Sort-Object Name |
         ForEach-Object -Begin {$SNo = 1} -Process {
-            [PSCustomObject]@{
-                '###' = $SNo++;
+            $JumpRecord = [PSCustomObject]@{
+                ' #' = $SNo++;
                 'Label' = $_.Name;
                 'Link' = $_.Value;
-                'Target' = Expand-JumperLink $_.Name
             }
+            if ($ShowTargets) {
+                Add-Member -InputObject $JumpRecord -MemberType NoteProperty -Name 'Target' -Value (Expand-JumperLink $_.Name)
+            }
+            $JumpRecord
         }
 }
 
