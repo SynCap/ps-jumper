@@ -161,6 +161,15 @@ function Read-JumperFile {
     <#
     .synopsis
         Set or enhance jumper label list from JSON or text (INI) file
+    .Description
+        JSON file must contain plain object with no child items. Just key-value pairs where key is a label
+        and value is an instruction which describes the exact filesystem path.
+
+        INI file can contain comments of PowerShell format. Key-value pairs is need not to be enclosed with quotes.
+        Separator of keys and values is a first equal sign.
+
+        If value starts with equal sign the rest of string in INI file and rest of valid JSON value accepted as
+        PowerShell instructions that have to retrun String value of valid path.
     #>
 
     # [CmdletBinding(SupportsShouldProcess)]
