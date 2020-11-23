@@ -548,16 +548,13 @@ function Invoke-JumperCommand {
         { $_ -in ( 'Expand', 'e'        ) } { Expand-JumperLink @Params;  break }
         { $_ -in ( 'Get', 'g'           ) } { Get-Jumper @Params;         break }
         { $_ -in ( 'History', 'sh'      ) } { Show-JumperHistory @Params; break }
-        { $_ -in ( 'Read', 'rd', 'load' ) } {
-            $Clear = '-c' -in $Params -or '-Clear' -in $Params;
-            Read-JumperFile $Params[0] -Clear:$Clear;
-            break
-        }
-        { $_ -in ( 'Resolve', 'rv' ) } { Resolve-JumperList;      break }
-        { $_ -in ( 'Restart', 'rt' ) } { Restart-JumperModule;    break }
-        { $_ -in ( 'Save', 'sv'    ) } { Save-JumperList @Params; break }
-        { $_ -in ( 'Set', 's'      ) } { Set-JumperLink @Params;  break }
-        { $_ -in ( 'Help', 'h'     ) } { Get-JumperHelp;          break }
+        { $_ -in ( 'Read', 'rd', 'load' ) } { Read-JumperFile @Params;    break }
+        { $_ -in ( 'Resolve', 'rv'      ) } { Resolve-JumperList;         break }
+        { $_ -in ( 'Restart', 'rt'      ) } { Restart-JumperModule;       break }
+        { $_ -in ( 'Save', 'sv'         ) } { Save-JumperList @Params;    break }
+        { $_ -in ( 'Set', 's'           ) } { Set-JumperLink @Params;     break }
+        { $_ -in ( 'Help', 'h'          ) } { Get-JumperHelp;             break }
+        { $_ -in ( '?', 'l'             ) } { Get-Jumper @Params;         break }
     }
 }
 
