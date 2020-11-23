@@ -404,9 +404,13 @@ function Use-Jumper {
             g %appdata%
     #>
     param (
+        # Label identifies a some place in file system
         [Parameter(position = 0)] $Label = '~',
+        # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
         [Parameter(position = 1)] $Path = '',
+        # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
         [Alias('s')] [Switch]     $AsString = $false,
+        # Instruct the Jumper to force actual jump to the place described by evaluated path
         [Alias('f')] [Switch]     $Force = $false
     )
 
