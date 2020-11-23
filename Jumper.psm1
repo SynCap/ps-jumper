@@ -146,6 +146,10 @@ function Get-ShellPredefinedFolder ([parameter(ValueFromPipeline,ValueFromPipeli
 }
 Set-Alias spf -Value Get-ShellPredefinedFolder
 
+<#
+    .synopsis
+        Expand all Environment variables in the string
+#>
 function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
     $re = '#\(\s*(\w+?)\s*\)'
     $s -replace $re, { Get-ShellPredefinedFolder $_.Groups[1].Value }
