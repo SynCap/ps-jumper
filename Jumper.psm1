@@ -494,8 +494,7 @@ function Restart-JumperModule {
             Try to force reload the Jumper module itself.
     #>
     [CmdletBinding(SupportsShouldProcess)]
-    Param(
-    )
+
     $ModuleName = (Split-Path $PSScriptRoot -LeafBase)
     Write-Verbose "JUMPER: try to UNload $ModuleName ($PSScriptRoot)"
     Remove-Module $ModuleName -Force -Verbose:$Verbose
