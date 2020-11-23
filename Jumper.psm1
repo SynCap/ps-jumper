@@ -514,22 +514,26 @@ function Invoke-JumperCommand {
         .Description
             Launch Jumper commands.
 
+            Note: only direct call of Jumper command can be used with additional switches.
+            This shortcut can call commands only using positional parameters
+
             Registered commands:
 
                 go            Jump to target using label and added path or get the resolved path.
 
                  a | add      Add label to jumper list:
-                                 jr add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                                 j add <Label> <Target_Dir | SpecialFolder_Alias | Expression>
                  c | clear    Clear jumper label list
-            rm | d | disable  Remove record from jumper label list by label: jr disable <Label>
+            rm | d | disable  Remove record from jumper label list by label: j disable <Label>
                  e | expand   Expand path variables and evaluate expressions in value of jumper link
-                 g | get      Get full or filtered jumper link list: jr get [match_mask]
+                 g | get      Get full or filtered jumper link list: j get [match_mask]
                 sh | history  Show session history of jumps
-                rd | read     Set or enhance jumper label list from JSON or text (INI) file: jr read <FullPath | FileName_in_Data_Dir>
+                rd | read     Set or enhance jumper label list from JSON or text (INI) file: j read <FullPath | FileName_in_Data_Dir>
                 rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
                 rt | restart  Try to reload module itself
-                sv | save     Save current Jumper Links List to the file: jr save <FullPath | FileName_in_Data_Dir>
-                 s | set      Direct updates the Jumper Link: jr set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                sv | save     Save current Jumper Links List to the file: j save <FullPath | FileName_in_Data_Dir>
+                 s | set      Direct updates the Jumper Link: j set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
+                 ? | l        Get list of available jump labels with links
     #>
 
     param(
