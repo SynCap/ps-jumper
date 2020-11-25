@@ -83,6 +83,8 @@
   "job": "%JOB%",
   "jslab": "%JOB%\\JS\\Lab",
   "kali": "%LocalAppData%\\Packages\\KaliLinux.54290C8133FEE_ey8k8hqnwqnmg\\LocalState\\rootfs\\home\\closk",
+  "debian": "%LocalAppData%\\Packages\\TheDebianProject.DebianGNULinux_76v4gfsz19hv4\\LocalState\\rootfs\\home\\closk\\",
+  "alpine": "c:\\Users\\SynCap\\AppData\\Local\\Packages\\36828agowa338.AlpineWSL_my43bytk1c4nr\\LocalState\\rootfs\\home\\closk\\",
   "lab": "%JOB%\\Lab",
   "mail/cld": "%WebDrv%\\Cloud@Mail.Ru",
   "mlt": "#(MyVideo)\\Mlt",
