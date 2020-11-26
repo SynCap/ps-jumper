@@ -531,7 +531,7 @@ function Invoke-JumperCommand {
                 rd | read     Set or enhance jumper label list from JSON or text (INI) file: j read <FullPath | FileName_in_Data_Dir>
                 rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
                 rt | restart  Try to reload module itself
-                sv | save     Save current Jumper Links List to the file: j save <FullPath | FileName_in_Data_Dir>
+                sv | save     Save current Jumper Links List to the file: j save [FullPath | FileName_in_Data_Dir]
                  s | set      Direct updates the Jumper Link: j set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
                  ? | l        Get list of available jump labels with links
     #>
