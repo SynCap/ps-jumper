@@ -431,14 +431,14 @@ function Use-Jumper {
         [Parameter(position = 0)]
         [ArgumentCompleter({
             # receive information about current state:
-            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
 
-            Get-Jumper | Where-Object {$_.Label -like "$wordToComplete*" } |
+            Get-Jumper | Where-Object {$_.Label -like "$WordToComplete*" } |
                 Foreach-Object {
                     $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell explression' : 'path string'
                     [System.Management.Automation.CompletionResult]::new($_.Label, $_.Label, 'ParameterValue', "Jumper Link for $LinkType")
                 }
-            [Enum]::GetNames([System.Environment+SpecialFolder]) | Where-Object {$_ -like '$wordToComplete*'}|
+            [Enum]::GetNames([System.Environment+SpecialFolder]) | Where-Object {$_ -like '$WordToComplete*'}|
                 Foreach-Object {
                     [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', "Shell Folder Alias")
                 }
