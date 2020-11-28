@@ -483,7 +483,7 @@ function Use-Jumper {
             break;
         }
 
-        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($TestPath = [Environment]::GetFolderPath($Label)))} {
+        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path [Environment]::GetFolderPath($Label))} {
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
@@ -496,7 +496,7 @@ function Use-Jumper {
             break;
         }
 
-        { Test-Path ($TestPath = [System.Environment]::ExpandEnvironmentVariables($Label))}{
+        { Test-Path ( [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
             $Target = [System.Environment]::ExpandEnvironmentVariables($Label)
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
