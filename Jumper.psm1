@@ -203,6 +203,12 @@ function Read-JumperFile {
     # println "`$PSBoundParameters : `e[33m" , $PSBoundParameters , $RC
     # $PSBoundParameters | Format-List *
 
+    # Default value actual if no params trasferred only
+    # But if transmitted empty string as value
+    # setting defaults skipped, so we need check value and
+    # correct'em directly
+    if (!$Path) {$Path = $Script:JumperDataFile}
+
     if (Test-Path ($tp = Join-Path $Script:JumperDataDir $Path)) {
         $Path = $tp
     } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.json")) {
