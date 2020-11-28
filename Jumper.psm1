@@ -119,6 +119,8 @@ $Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFil
 $RC = "`e[0m" # Reset Console
 $Script:JumperSPF = @{}
 
+$Global:JpDebug = [Collections.ArrayList]::new()
+
 ############################# Helper functions
 function Script:hr($Ch = '-', $Cnt = 0 -bor [Console]::WindowWidth / 2) { $Ch * $Cnt }
 
