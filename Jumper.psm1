@@ -582,7 +582,7 @@ function Invoke-JumperCommand {
                 rt | restart  Try to reload module itself
                 sv | save     Save current Jumper Links List to the file: j save [FullPath | FileName_in_Data_Dir]
                  s | set      Direct updates the Jumper Link: j set <Label> <Target_Dir | SpecialFolder_Alias | Expression>
-                 ? | l        Get list of available jump labels with links
+             ? | l | list     Get list of available jump labels with links
     #>
 
     param(
@@ -603,7 +603,7 @@ function Invoke-JumperCommand {
         { $_ -in ( 'Save', 'sv'         ) } { Save-JumperList @Params;    break }
         { $_ -in ( 'Set', 's'           ) } { Set-JumperLink @Params;     break }
         { $_ -in ( 'Help', 'h'          ) } { Get-JumperHelp;             break }
-        { $_ -in ( '?', 'l'             ) } { Get-Jumper @Params;         break }
+        { $_ -in ( '?', 'l', 'list'     ) } { Get-Jumper @Params;                     break }
     }
 }
 
