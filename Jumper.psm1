@@ -233,8 +233,7 @@ function Read-JumperFile {
         (ReadFromText($Path)) ) | ForEach-Object {
             foreach ($key in $_.Keys) {
                 if ($Script:Jumper.ContainsKey($key)) {
-                    println "`e[33m",
-                            "Link conflict: label`e[91m $key`e[33m already exists", $RC
+                    println "`e[33m", "Link conflict: label`e[91m $key`e[33m already exists", $RC
                     println "       Exists: `e[36m", $Script:Jumper[$key], $RC
                     println "  Want to add: `e[96m", $_[$key], $RC
                 }
