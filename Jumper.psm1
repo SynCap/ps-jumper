@@ -115,6 +115,7 @@ $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
 $Script:DefaultDataFile = 'jumper.json'
+$Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile -Resolve)
 $RC = "`e[0m" # Reset Console
 $Script:JumperSPF = @{}
 
@@ -164,9 +165,10 @@ function Set-JumperDefaultDataFile {
     )
     if (Test-Path (Join-Path $Script:JumperDataDir $Name)) {
         $Script:DefaultDataFile = $Name
+        $Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile -Resolve)
         Write-Verbose "Set new default data file to $Name"
         if ($ForceRead) {
-            Read-JumperFile
+            Read-JumperFile $Script:JumperDataFile -Clear
             Write-Verbose "Force read new default data file $Name"
         } else {
             Write-Verbose "Try to set new default data file to $Name. File seems to be not layed there"
@@ -597,4 +599,6 @@ function Invoke-JumperCommand {
 
 ############################## Initialisation, Read default Data
 
-    Read-JumperFile jumper.json
+    if (Test-Path $Script:JumperDataFile) {
+        Read-JumperFile $Script:JumperDataFile
+    }
