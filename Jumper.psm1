@@ -433,7 +433,20 @@ function Use-Jumper {
     param (
         # Label identifies a some place in file system
         [Parameter(position = 0)]
-        [ValidateScript({$true})]
+        [ArgumentCompleter({
+            # receive information about current state:
+            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+            Get-Jumper | Where-Object {$_.Label -like "$wordToComplete*" } |
+                Foreach-Object {
+                    $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell explression' : 'path string'
+                    [System.Management.Automation.CompletionResult]::new($_.Label, $_.Label, 'ParameterValue', "Jumper Link for $LinkType")
+                }
+            [Enum]::GetNames([System.Environment+SpecialFolder]) | Where-Object {$_ -like '$wordToComplete*'}|
+                Foreach-Object {
+                    [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', "Shell Folder Alias")
+                }
+        })]
         [String]
         $Label = '~',
         # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
