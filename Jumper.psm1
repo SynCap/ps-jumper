@@ -586,8 +586,20 @@ function Invoke-JumperCommand {
     #>
 
     param(
-        [Parameter(position = 0)] [String] $Command = 'Help',
-        [Parameter(Position = 1, ValueFromRemainingArguments)] [string[]] $Params
+        [Parameter(position = 0)]
+        [ArgumentCompleter({
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            'Add', 'Clear', 'Data', 'Disable', 'Expand', 'Get', 'Help', 'History', 'Read', 'Resolve', 'Restart', 'Save', 'Set', 'List' |
+            Where-Object {$_ -like "$WordToComplete*"} |
+            Foreach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, "ParameterValue", $_)
+            }
+        })]
+        [String]
+        $Command = 'Help',
+        [Parameter(Position = 1, ValueFromRemainingArguments)]
+        [string[]]
+        $Params
     )
 
     switch ($Command) {
