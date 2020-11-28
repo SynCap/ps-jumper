@@ -445,10 +445,28 @@ function Use-Jumper {
         })]
         [String]
         $Label = '~',
+
         # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
+        [ArgumentCompleter({
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            $JpDebug.Add(@{'Completion FakeBoundParameters'=$FakeBoundParameters})
+            if ($FakeBoundParameters.ContainsKey('Label')) {
+                $ParentPath = Expand-JumperLink $FakeBoundParameters['Label']
+            } elseif ($fakeBoundParameters.Count -eq 2) {
+                $Parentpath = $FakeBoundParameters[0]
+            } else {$ParentPath = '.'}
+            $SearchPath = (Join-Path $ParentPath ($WordToComplete -replace '(^.*[/\\]?)','$1') -Resolve)
+            Get-ChildItem $SearchPath |
+                Foreach-Object {
+                    $SubPath = $_.FullName.Substring($SearchPath.Length)
+                    [System.Management.Automation.CompletionResult]::new($SubPath, $_.Name, 'ParameterValue')
+                }
+            })]
         [Parameter(position = 1)] [String] $Path = '',
+
         # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
         [Alias('s')] [Switch]     $AsString = $false,
+
         # Instruct the Jumper to force actual jump to the place described by evaluated path
         [Alias('f')] [Switch]     $Force = $false
     )
