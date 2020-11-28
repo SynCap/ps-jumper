@@ -546,7 +546,13 @@ function Restart-JumperModule {
 }
 
 function Get-JumperHelp {
+    "`n"
+    'Jumper Commands'
+    '==============='
     Get-Help Jumper|Sort-Object Name|Format-Table Name,Synopsis
+    'Jumper Aliases'
+    '=============='
+    Get-Alias | Where-Object Definition -match '-Jumper' | Select-Object Name,Definition,Description
 }
 
 function Invoke-JumperCommand {
