@@ -157,6 +157,23 @@ function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
 
 ############################# Module Core
 
+function Set-JumperDefaultDataFile {
+    param (
+        [String] $Name,
+        [Switch] $ForceRead
+    )
+    if (Test-Path (Join-Path $Script:JumperDataDir $Name)) {
+        $Script:DefaultDataFile = $Name
+        Write-Verbose "Set new default data file to $Name"
+        if ($ForceRead) {
+            Read-JumperFile
+            Write-Verbose "Force read new default data file $Name"
+        } else {
+            Write-Verbose "Try to set new default data file to $Name. File seems to be not layed there"
+        }
+    }
+}
+
 function Read-JumperFile {
     <#
     .synopsis
