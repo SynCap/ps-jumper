@@ -115,7 +115,7 @@ $Script:Jumper = @{}
 $Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
 $Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
 $Script:DefaultDataFile = 'jumper.json'
-$Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile -Resolve)
+$Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
 $RC = "`e[0m" # Reset Console
 $Script:JumperSPF = @{}
 
@@ -193,7 +193,7 @@ function Read-JumperFile {
 
     # [CmdletBinding(SupportsShouldProcess)]
     param (
-        [Parameter(position = 0)] $Path = ( Join-Path $Script:JumperDataDir $Script:DefaultDataFile ),
+        [Parameter(position = 0)] $Path,
         [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
 
@@ -330,8 +330,11 @@ function Save-JumperList {
         Save current Jumper Links List to the file
     #>
     Param (
-        $Path = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
+        $Path = $Script:DefaultDataFile
     )
+    if(!$Path) {
+        $Path = $Script:DefaultDataFile
+    }
     if ($Path -notmatch '\\') { $Path = Join-Path $Script:JumperDataDir $Path }
     if ($Path -notmatch '\.json$') { $Path += '.json' }
 
