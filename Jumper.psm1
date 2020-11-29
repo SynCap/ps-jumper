@@ -454,6 +454,14 @@ function Use-Jumper {
         $Label = '~',
 
         # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
+        # [ArgumentCompleter({
+        #     param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+
+        #     if($FakeBoundParameters.ContainsKey('Label')) {
+        #         $LookupPath = Expand-JumperLink $FakeBoundParameters['Label']
+        #         [void]$JpDebug.add("Found <Label> param with value: $LookupPath")
+        #     }
+        # })]
         [Parameter(position = 1)] [String] $Path = '',
 
         # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
