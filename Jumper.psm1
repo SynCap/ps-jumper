@@ -119,6 +119,13 @@ $Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFil
 $RC = "`e[0m" # Reset Console
 $Script:JumperSPF = @{}
 
+<#
+    Как пользоваться JpDebug:
+    1. В коде добавляем значение, которое хотим отследить, с коментами, как хеш, строку и т.п.
+    2. После выполняем:
+        $i=0;$JpDebug | % {print "`e[2;4;7m $i `e[0m ";$_ | ft;$i++}
+    3. Сбросить значения, просто `$JpDebug.Clear()`
+#>
 $Global:JpDebug = [Collections.ArrayList]::new()
 
 ############################# Helper functions
