@@ -262,7 +262,11 @@ function Get-Jumper {
         # Filter by Links too
         [Alias('l')][Switch] $ByLink
     )
-    $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $Filter -or ($ByLink -and $_.Value -imatch $Filter) } | Sort-Object Name |
+    $list = $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $Filter -or ($ByLink -and $_.Value -imatch $Filter) }
+    if (0 -eq $list.Count) {
+        return ( $Filter ? "Nothing found for `e[33m$Filter`e[0m" : 'Jumper list is empty' )
+    }
+    $list | Sort-Object Name |
         ForEach-Object -Begin {$SNo = 1} -Process {
             $JumpRecord = [PSCustomObject]@{
                 ' #' = $SNo++;
