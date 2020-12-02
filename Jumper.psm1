@@ -167,6 +167,10 @@ function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
 
 ############################# Module Core
 
+function Get-JumperDefaultDataFile {
+    $Script:JumperDataFile
+}
+
 function Set-JumperDefaultDataFile {
     param (
         [String] $Name,
