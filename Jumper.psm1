@@ -118,6 +118,7 @@ $Script:DefaultDataFile = 'jumper.json'
 $Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
 $RC = "`e[0m" # Reset Console
 $Script:JumperSPF = @{}
+$Script:itemsToShow=15 # Maximal numer of the itmes (dirs or files) to show after successful jump
 
 <#
     Как пользоваться JpDebug:
@@ -546,6 +547,17 @@ function Use-Jumper {
         }
         if ($Verbose) { println $JumpMessage }
         Set-Location $Target
+        println "`e[33m$((Get-Location).Path)`e[0;1m"
+
+        $cntDirs = (Get-ChildItem $Target -Force -Directory).Count
+        print ((Get-ChildItem $Target -Force -Directory | Select-Object -First $itemsToShow Name | Foreach-Object {" `e[1;4m{0}`e[0m " -f $_.Name}) -join " "," ")
+        print "`e[0;2m"
+        if ($itemsToShow -lt $cntDirs) {print "... And `e[97;2m$($cntDirs - $itemsToShow)`e[0;2m dirs more`n"}
+
+        $cntFiles = (Get-ChildItem $Target -Force -File).Count
+        print ((Get-ChildItem $Target -Force -File | Select-Object -First $itemsToShow Name | ForEach-Object { " `e[2;4m{0}`e[0m " -f $_.Name }) -join "  ")
+        if ($itemsToShow -lt $cntFiles) {print "`e[0;2m... And `e[33;2m$($cntFiles - $itemsToShow)`e[0;2m files more"}
+        "`e[0m"
     }
     else {
         return $Target
