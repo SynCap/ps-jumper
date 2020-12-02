@@ -567,6 +567,7 @@ function Restart-JumperModule {
 }
 
 function Get-JumperHelp {
+    "To get help about this command itself use `e[32mGet-Help Get-JumperHelp`e[0m or `e[32mhelp j`e[31m😉😁`e[0m"
     "`n"
     'Jumper Commands'
     '==============='
