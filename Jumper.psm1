@@ -174,7 +174,7 @@ function Get-JumperDefaultDataFile {
 function Set-JumperDefaultDataFile {
     param (
         [String] $Name,
-        [Switch] $ForceRead
+        [Alias('f')][Switch] $ForceRead
     )
     if (Test-Path (Join-Path $Script:JumperDataDir $Name)) {
         $Script:DefaultDataFile = $Name
