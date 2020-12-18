@@ -505,8 +505,8 @@ function Use-Jumper {
             break;
         }
 
-        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ([Environment]::GetFolderPath($Label)))} {
-            $Target = $TestPath
+        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($Script:TestPath = [Environment]::GetFolderPath($Label)))} {
+            $Target = $Script:TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
@@ -518,8 +518,8 @@ function Use-Jumper {
             break;
         }
 
-        { Test-Path ( [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
-            $Target = [System.Environment]::ExpandEnvironmentVariables($Label)
+        { Test-Path ($Script:TestPath = [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
+            $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
@@ -547,6 +547,7 @@ function Use-Jumper {
         }
         if ($Verbose) { println $JumpMessage }
         Set-Location $Target
+
         println "`e[33m$((Get-Location).Path)`e[0;1m"
 
         $cntDirs = (Get-ChildItem $Target -Force -Directory).Count
