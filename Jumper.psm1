@@ -111,14 +111,14 @@
 ############################# Code Analysis Suppress Rules
 
 ############################# Data
-$Script:Jumper = @{}
-$Script:JumperHistory = [System.Collections.Generic.List[string]]::new()
-$Script:JumperDataDir = Join-Path $PSScriptRoot 'data'
-$Script:DefaultDataFile = 'jumper.json'
-$Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile)
+$Jumper = @{}
+$Global:JumperHistory = [System.Collections.Generic.List[string]]::new()
+$JumperDataDir = Join-Path $PSScriptRoot 'data'
+$DefaultDataFile = 'jumper.json'
+$JumperDataFile = (Join-Path $JumperDataDir $DefaultDataFile)
 $RC = "`e[0m" # Reset Console
-$Script:JumperSPF = @{}
-$Script:itemsToShow=15 # Maximal numer of the itmes (dirs or files) to show after successful jump
+$JumperSPF = @{}
+$itemsToShow=15 # Maximal numer of the itmes (dirs or files) to show after successful jump
 
 <#
     Как пользоваться JpDebug:
