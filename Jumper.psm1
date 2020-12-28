@@ -557,11 +557,10 @@ function Use-Jumper {
 
     $Force = $Force -or (('' -eq $Path) -and !$Force)
     if ($Force -and !$AsString) {
-        if ('-' -ne $Label) {
-            if ($Script:JumperHistory[-1] -ne $PWD) {
-                $Script:JumperHistory.Add( "$PWD" )
-            }
+        if ($JumperHistory[-1] -ne $PWD) {
+            $JumperHistory.Add( "$PWD" )
         }
+
         if ($Verbose) { println $JumpMessage }
         Set-Location $Target
 
