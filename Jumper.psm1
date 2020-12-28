@@ -497,14 +497,10 @@ function Use-Jumper {
         { '=' -eq $Label[0] } {
             if ($JumperHistory.Count) {
 
-                println "`e[94mLabel: `e[96m$Label"
                 $n = [int]($Label.Substring(1))
-                println "`e[94mN: `e[96m$n"
                 if (-1 -lt $n) {$n--}
                 if (0 -gt $n) {$n += $JumperHistory.Count}
-                println "`e[94mN: `e[96m$n"
                 $Target = $JumperHistory[$n]
-                println "`e[95mTarget: `e[36m$Target"
 
                 $JumpMessage = "${RC} Go back to `e[33m", $Target,
                 "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
