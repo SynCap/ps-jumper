@@ -161,7 +161,7 @@ Set-Alias spf -Value Get-ShellPredefinedFolder
     .synopsis
         Expand all Environment variables in the string
 #>
-function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
+function exps ([parameter(ValueFromPipeline)][string]$s) {
     $re = '#\(\s*(\w+?)\s*\)'
     $s -replace $re, { Get-ShellPredefinedFolder $_.Groups[1].Value }
 }
@@ -169,7 +169,7 @@ function Script:exps ([parameter(ValueFromPipeline)][string]$s) {
 ############################# Module Core
 
 function Get-JumperDefaultDataFile {
-    $Script:JumperDataFile
+    $JumperDataFile
 }
 
 function Set-JumperDefaultDataFile {
@@ -177,12 +177,12 @@ function Set-JumperDefaultDataFile {
         [String] $Name,
         [Alias('f')][Switch] $ForceRead
     )
-    if (Test-Path (Join-Path $Script:JumperDataDir $Name)) {
-        $Script:DefaultDataFile = $Name
-        $Script:JumperDataFile = (Join-Path $Script:JumperDataDir $Script:DefaultDataFile -Resolve)
+    if (Test-Path (Join-Path $JumperDataDir $Name)) {
+        $DefaultDataFile = $Name
+        $JumperDataFile = (Join-Path $JumperDataDir $DefaultDataFile -Resolve)
         Write-Verbose "Set new default data file to $Name"
         if ($ForceRead) {
-            Read-JumperFile $Script:JumperDataFile -Clear
+            Read-JumperFile $JumperDataFile -Clear
             Write-Verbose "Force read new default data file $Name"
         } else {
             Write-Verbose "Try to set new default data file to $Name. File seems to be not layed there"
@@ -215,13 +215,13 @@ function Read-JumperFile {
     # But if transmitted empty string as value
     # setting defaults skipped, so we need check value and
     # correct'em directly
-    if (!$Path) {$Path = $Script:JumperDataFile}
+    if (!$Path) {$Path = $JumperDataFile}
 
-    if (Test-Path ($tp = Join-Path $Script:JumperDataDir $Path)) {
+    if (Test-Path ($tp = Join-Path $JumperDataDir $Path)) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.json")) {
+    } elseif (Test-Path ($tp = Join-Path $JumperDataDir "$Path.json")) {
         $Path = $tp
-    } elseif (Test-Path ($tp = Join-Path $Script:JumperDataDir "$Path.ini")) {
+    } elseif (Test-Path ($tp = Join-Path $JumperDataDir "$Path.ini")) {
         $Path = $tp
     } if (!(Test-Path $Path)) {
         Write-Warning "Jumper file `e[33m$Path${RC} not found"
@@ -234,24 +234,24 @@ function Read-JumperFile {
             ConvertFrom-StringData | ForEach-Object { $Out += $_ }; $Out
     };
 
-    if ($Clear) { $Script:Jumper.Clear() }
+    if ($Clear) { $Jumper.Clear() }
 
     ( ('json' -ieq ($Path.Split('.')[-1])) ?
         (ReadFromJson($Path)) :
         (ReadFromText($Path)) ) | ForEach-Object {
             foreach ($key in $_.Keys) {
-                if ($Script:Jumper.ContainsKey($key)) {
+                if ($Jumper.ContainsKey($key)) {
                     println "`e[33m", "Link conflict: label`e[91m $key`e[33m already exists", $RC
-                    println "       Exists: `e[36m", $Script:Jumper[$key], $RC
+                    println "       Exists: `e[36m", $Jumper[$key], $RC
                     println "  Want to add: `e[96m", $_[$key], $RC
                 }
                 else {
-                    $Script:Jumper.($key) = $_.($key)
+                    $Jumper.($key) = $_.($key)
                 }
             }
         }
 
-    Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Script:Jumper.Count )
+    Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Jumper.Count )
 }
 
 function Get-Jumper {
@@ -267,7 +267,7 @@ function Get-Jumper {
         # Filter by Links too
         [Alias('l')][Switch] $ByLink
     )
-    $list = $Script:Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $Filter -or ($ByLink -and $_.Value -imatch $Filter) }
+    $list = $Jumper.GetEnumerator() | Where-Object { $_.Name -imatch $Filter -or ($ByLink -and $_.Value -imatch $Filter) }
     if (0 -eq $list.Count) {
         return ( $Filter ? "Nothing found for `e[33m$Filter`e[0m" : 'Jumper list is empty' )
     }
@@ -290,8 +290,8 @@ function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
     .synopsis
         Just show saved history of jumps
     #>
-    if ($Script:JumperHistory.Count) { Script:hr } else { "`e[33mNo Jumper history yet${RC}"; return; }
-    ($Reverse ? ( $Script:JumperHistory.Reverse() ) : ( $Script:JumperHistory )) |
+    if ($JumperHistory.Count) { hr } else { "`e[33mNo Jumper history yet${RC}"; return; }
+    ($Reverse ? ( $JumperHistory.Reverse() ) : ( $JumperHistory )) |
         ForEach-Object -Begin {$Index = 1} -Process {
             println "`e[32m", $Index, ". ", $RC, $_
             $index++
@@ -307,7 +307,7 @@ function Set-JumperLink {
         [Parameter(mandatory, position = 0)]                   $Label,
         [Parameter(mandatory, position = 1, ValueFromPipeline)] $Path
     )
-    $Script:Jumper[$Label] = $Path
+    $Jumper[$Label] = $Path
 }
 
 function Add-Jumper {
@@ -322,7 +322,7 @@ function Add-Jumper {
         [Parameter(mandatory, position = 0)]                   $Label,
         [Parameter(mandatory, position = 1, ValueFromPipeline)] $Path
     )
-    $Script:Jumper.Add($Label, $Path)
+    $Jumper.Add($Label, $Path)
 }
 
 function Disable-JumperLink ([Parameter(mandatory)] $Label) {
@@ -330,7 +330,7 @@ function Disable-JumperLink ([Parameter(mandatory)] $Label) {
     .synopsis
         Remove record from jumper label list
     #>
-    $Script:Jumper.Remove($Label)
+    $Jumper.Remove($Label)
 }
 
 function Clear-Jumper {
@@ -338,7 +338,7 @@ function Clear-Jumper {
     .synopsis
         Clear jumper label list
     #>
-    $Script:Jumper.Clear()
+    $Jumper.Clear()
 }
 
 function Save-JumperList {
@@ -347,16 +347,16 @@ function Save-JumperList {
         Save current Jumper Links List to the file
     #>
     Param (
-        $Path = $Script:DefaultDataFile
+        $Path = $DefaultDataFile
     )
     if(!$Path) {
-        $Path = $Script:DefaultDataFile
+        $Path = $DefaultDataFile
     }
-    if ($Path -notmatch '\\') { $Path = Join-Path $Script:JumperDataDir $Path }
+    if ($Path -notmatch '\\') { $Path = Join-Path $JumperDataDir $Path }
     if ($Path -notmatch '\.json$') { $Path += '.json' }
 
     Write-Verbose $Path
-    ConvertTo-Json $Script:Jumper | Set-Content -Path $Path
+    ConvertTo-Json $Jumper | Set-Content -Path $Path
 }
 
 function Expand-JumperLink {
@@ -369,11 +369,11 @@ function Expand-JumperLink {
         $Label
     )
     Process {
-        if ($Label -in $Script:Jumper.Keys -and '=' -eq $Script:Jumper[$Label][0]) {
-            Invoke-Expression $Script:Jumper[$Label].Substring(1)
+        if ($Label -in $Jumper.Keys -and '=' -eq $Jumper[$Label][0]) {
+            Invoke-Expression $Jumper[$Label].Substring(1)
         }
         else {
-            [System.Environment]::ExpandEnvironmentVariables($Script:Jumper[$Label]) | exps
+            [System.Environment]::ExpandEnvironmentVariables($Jumper[$Label]) | exps
         }
     }
 }
@@ -383,8 +383,8 @@ function Resolve-JumperList {
     .synopsis
         Expand all links in list
     #>
-    foreach ($Label in $Script:Jumper.Keys) {
-        $Script:Jumper[$Label] = Expand-JumperLink $Label
+    foreach ($Label in $Jumper.Keys) {
+        $Jumper[$Label] = Expand-JumperLink $Label
     }
 }
 
@@ -398,8 +398,16 @@ function Use-Jumper {
             of Get or Go). Also provided default link alias `~` for user's home dir (%UserProfile%, ussually `C:\Users\<UserName>\`),
             so to jump to profile home dir just use `~` command. `~ ~` or `g ~` do the same.
 
-            In addition Jumper have its own history of jumps and one more "magic" label -- `-` (minus sign) which mean to jump to location
-            last in history of transitions made using `Use-Jumper`. So `~ -` is an analogue of "Back button" in the browsers.
+            In addition Jumper have its own history of jumps and one more "magic" label -- `=` (equal sign) which mean
+            to jump to location that is last in history of transitions made using `Use-Jumper`. So `g =` is an analogue
+            of "Back button" in the browsers.
+
+            Of course you may browse throguh history with magic dot:
+                g =-1 # back over 1, i.e. pred last in history list
+                g =-2 # back over 2
+                g =1 # to first record of history
+                g =30 # to record of history with label `30.`
+                g =0  # same as `g =`, that is -- just back in time, 0h-h! in history of jumps of course!
 
             `Use-Jumper` automatically evaluates the pathes of system folders such as `My Documents`, `Application Data`, and so on. To see
             what aliases are valid for those folders use `Get-ShellPredefinedFolder` function.
@@ -499,14 +507,14 @@ function Use-Jumper {
             }
         }
 
-        { [bool]$Script:Jumper[$Label] } {
-            $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Script:Jumper[$Label], $RC
+        { [bool]$Jumper[$Label] } {
+            $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Jumper[$Label], $RC
             $Target = Expand-JumperLink $Label
             break;
         }
 
-        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($Script:TestPath = [Environment]::GetFolderPath($Label)))} {
-            $Target = $Script:TestPath
+        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($TestPath = [Environment]::GetFolderPath($Label)))} {
+            $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
@@ -518,7 +526,7 @@ function Use-Jumper {
             break;
         }
 
-        { Test-Path ($Script:TestPath = [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
+        { Test-Path ($TestPath = [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
@@ -677,6 +685,6 @@ function Invoke-JumperCommand {
 
 ############################## Initialisation, Read default Data
 
-    if (Test-Path $Script:JumperDataFile) {
-        Read-JumperFile $Script:JumperDataFile
+    if (Test-Path $JumperDataFile) {
+        Read-JumperFile $JumperDataFile
     }
