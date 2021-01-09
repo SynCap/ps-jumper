@@ -378,7 +378,7 @@ function Expand-JumperLink {
             Invoke-Expression $Jumper[$Label].Substring(1)
         }
         else {
-            [System.Environment]::ExpandEnvironmentVariables($Jumper[$Label]) | exps
+            [System.Environment]::ExpandEnvironmentVariables($Jumper[$Label]) | Expand-ShellFolderAliases
         }
     }
 }
