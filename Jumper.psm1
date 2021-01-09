@@ -162,9 +162,13 @@ Set-Alias spf -Value Get-ShellPredefinedFolder
     .synopsis
         Expand all Environment variables in the string
 #>
-function exps ([parameter(ValueFromPipeline)][string]$s) {
-    $re = '#\(\s*(\w+?)\s*\)'
-    $s -replace $re, { Get-ShellPredefinedFolder $_.Groups[1].Value }
+filter Expand-ShellFolderAliases  {
+    param (
+        [parameter(ValueFromPipeline)]
+        [string]$PathTemplate
+    )
+    $RegexPattern = '#\(\s*(\w+?)\s*\)'
+    $PathTemplate -replace $RegexPattern, { (Get-ShellPredefinedFolder $_.Groups[1]).Value }
 }
 
 ############################# Module Core
