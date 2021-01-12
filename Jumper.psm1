@@ -141,7 +141,14 @@ function Script:println([Parameter(ValueFromPipeline)][String[]]$Params) {
     [System.Console]::WriteLine($Params -join '')
 }
 
-function Get-ShellPredefinedFolder ([parameter(ValueFromPipeline,ValueFromPipelineByPropertyName,position = 0)][string] $SpecialFolderAlias) {
+function Get-ShellPredefinedFolder {
+    param (
+        [parameter(
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            position = 0
+        )] [String] $SpecialFolderAlias
+    )
     if ([Enum]::GetNames([System.Environment+SpecialFolder]) -contains $SpecialFolderAlias) {
         [Environment]::GetFolderPath($SpecialFolderAlias)
     } else {
