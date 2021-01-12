@@ -530,7 +530,7 @@ function Use-Jumper {
             break;
         }
 
-        { ($Label -in [System.Environment+SpecialFolder].GetEnumNames()) -and (Test-Path ($TestPath = [Environment]::GetFolderPath($Label)))} {
+        { Test-Path (Get-ShellPredefinedFolder $Label) } {
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
