@@ -175,7 +175,7 @@ filter Expand-ShellFolderAliases  {
         [string]$PathTemplate
     )
     $RegexPattern = '#\(\s*(\w+?)\s*\)'
-    $PathTemplate -replace $RegexPattern, { (Get-ShellPredefinedFolder $_.Groups[1]).Value }
+    $PathTemplate -replace $RegexPattern, { (Get-ShellPredefinedFolder $_.Groups[1].Value) }
 }
 
 ############################# Module Core
