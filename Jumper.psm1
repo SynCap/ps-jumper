@@ -537,15 +537,15 @@ function Use-Jumper {
             break;
         }
 
-        { Test-Path $Label } {
-            $Target = Resolve-Path $Label;
-            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path: `e[93m", $Target, $RC
+        { Test-Path ($TestPath = (Expand-JumperLink $Label) ) }{
+            $Target = $TestPath
+            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
 
-        { Test-Path ($TestPath = [System.Environment]::ExpandEnvironmentVariables($Label) ) }{
-            $Target = $TestPath
-            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
+        { Test-Path $Label } {
+            $Target = Resolve-Path $Label;
+            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path: `e[93m", $Target, $RC
             break;
         }
 
