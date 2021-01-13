@@ -568,7 +568,10 @@ function Use-Jumper {
 
     if ($null -ne $Target) {
         if ($Path) {
-            $Target = Join-Path $Target $Path -Resolve
+            $Target = Join-Path $Target $Path -Resolve -ErrorVariable E -ErrorAction SilentlyContinue
+            if($E.Count) {
+                println `e[31m, $$E[-1].Exception.Message, `e[0m
+            }
         }
     } else {
         $Target = $PWD
