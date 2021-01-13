@@ -149,9 +149,7 @@ function Get-ShellPredefinedFolder {
             position = 0
         )] [String] $SpecialFolderAlias
     )
-    if ([Enum]::GetNames([System.Environment+SpecialFolder]) -contains $SpecialFolderAlias) {
-        [Environment]::GetFolderPath($SpecialFolderAlias)
-    } else {
+    if (!$JumperSPF.Count) {
         if (1 -gt $JumperSPF.Count) {
             [Enum]::GetNames([System.Environment+SpecialFolder]).GetEnumerator().forEach({
                 $path = [Environment]::GetFolderPath($_)
@@ -160,7 +158,11 @@ function Get-ShellPredefinedFolder {
                 }
             })
         }
+    }
+    if( !$JumperSPF[$SpecialFolderAlias] ) {
         $JumperSPF.GetEnumerator() | Select-Object Name,Value | Sort-Object Name | Where-Object Name -match $SpecialFolderAlias
+    } else {
+        $JumperSPF[$SpecialFolderAlias]
     }
 }
 Set-Alias spf -Value Get-ShellPredefinedFolder
