@@ -225,10 +225,12 @@ function Read-JumperFile {
         [Parameter(position = 1)] [Alias('c')] [Switch] $Clear
     )
 
-    # Default value actual if no params trasferred only
-    # But if transmitted empty string as value
-    # setting defaults skipped, so we need check value and
-    # correct'em directly
+    <#
+        Default value actual if no params trasferred only
+        But if transmitted empty string as value
+        setting defaults skipped, so we need check value and
+        correct'em directly
+    #>
     if (!$Path) {$Path = $JumperDataFile}
 
     if (Test-Path ($tp = Join-Path $JumperDataDir $Path)) {
