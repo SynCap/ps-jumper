@@ -542,7 +542,7 @@ function Use-Jumper {
         { $Script:TestPath = Get-ShellPredefinedFolder $_;  ( 'String' -eq $TestPath.GetType() ) -and ( Test-Path $TestPath ) } {
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
-            "Found shell folder for it: `e[33m", $Target, $RC -join ''
+                "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
         }
 
@@ -562,7 +562,7 @@ function Use-Jumper {
 
         default {
             $JumpMessage = "${RC}Probably `e[91mno correct label${RC} provided.`n",
-            "Target will be set to the current location: `e[33m", $PWD, $RC
+                "Target will be set to the current location: `e[33m", $PWD, $RC
         }
     }
 
