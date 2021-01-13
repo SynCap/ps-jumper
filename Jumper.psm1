@@ -536,16 +536,16 @@ function Use-Jumper {
             break;
         }
 
-        { Test-Path (Get-ShellPredefinedFolder $Label) } {
         # Special folder aliases
+        { $Script:TestPath = Get-ShellPredefinedFolder $_;  ( 'String' -eq $TestPath.GetType() ) -and ( Test-Path $TestPath ) } {
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
         }
 
-        { Test-Path ($TestPath = (Expand-JumperLink $Label) ) }{
         # Directly specified expression used shell folder alias(es) #(...) and/or env vars within it
+        { Test-Path ($Script:TestPath = (Expand-JumperLink $Label) ) }{
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
