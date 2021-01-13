@@ -484,14 +484,17 @@ function Use-Jumper {
         [String]
         $Label = '~',
 
-        # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
-        # [ArgumentCompleter({
-        #     param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
-        #     if($FakeBoundParameters.ContainsKey('Label')) {
-        #         $LookupPath = Expand-JumperLink $FakeBoundParameters['Label']
-        #         [void]$JpDebug.add("Found <Label> param with value: $LookupPath")
-        #     }
-        # })]
+        <#
+            Path can be as an actual filesystem path as a some instruction that evaluates to exact path
+            [ArgumentCompleter({
+                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+                if($FakeBoundParameters.ContainsKey('Label')) {
+                    $LookupPath = Expand-JumperLink $FakeBoundParameters['Label']
+                    [void]$JpDebug.add("Found <Label> param with value: $LookupPath")
+                }
+            })]
+        #>
+
         [Parameter(position = 1)] [String] $Path = '',
 
         # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
@@ -507,6 +510,7 @@ function Use-Jumper {
             break;
         }
 
+        # Jumps using history
         { '=' -eq $Label[0] } {
             if ($JumperHistory.Count) {
 
@@ -533,6 +537,7 @@ function Use-Jumper {
         }
 
         { Test-Path (Get-ShellPredefinedFolder $Label) } {
+        # Special folder aliases
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
             "Found shell folder for it: `e[33m", $Target, $RC -join ''
@@ -540,11 +545,13 @@ function Use-Jumper {
         }
 
         { Test-Path ($TestPath = (Expand-JumperLink $Label) ) }{
+        # Directly specified expression used shell folder alias(es) #(...) and/or env vars within it
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
 
+        # String that represent real path
         { Test-Path $Label } {
             $Target = Resolve-Path $Label;
             $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path: `e[93m", $Target, $RC
