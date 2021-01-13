@@ -485,7 +485,7 @@ function Use-Jumper {
         $Label = '~',
 
         <#
-            Path can be as an actual filesystem path as a some instruction that evaluates to exact path
+            # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
             [ArgumentCompleter({
                 param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
                 if($FakeBoundParameters.ContainsKey('Label')) {
