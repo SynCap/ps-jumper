@@ -117,7 +117,7 @@ $JumperDataDir = Join-Path $PSScriptRoot 'data'
 $DefaultDataFile = 'jumper.json'
 $JumperDataFile = (Join-Path $JumperDataDir $DefaultDataFile)
 $RC = "`e[0m" # Reset Console
-$JumperSPF = @{}
+$Global:JumperSPF = @{}
 $itemsToShow=15 # Maximal numer of the itmes (dirs or files) to show after successful jump
 $showLandingInfo = $false # show look around info just after jump
 
