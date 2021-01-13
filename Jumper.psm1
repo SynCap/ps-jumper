@@ -539,7 +539,7 @@ function Use-Jumper {
         }
 
         # Special folder aliases
-        { $Script:TestPath = Get-ShellPredefinedFolder $_;  ( 'String' -eq $TestPath.GetType() ) -and ( Test-Path $TestPath ) } {
+        { $Script:TestPath = Get-ShellPredefinedFolder $Label; $TestPath -and (Test-Path $TestPath) } {
             $Target = $TestPath
             $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
                 "Found shell folder for it: `e[33m", $Target, $RC -join ''
