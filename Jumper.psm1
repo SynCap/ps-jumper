@@ -632,6 +632,9 @@ function Get-JumperHelp {
     'Jumper Aliases'
     '=============='
     Get-Alias | Where-Object Definition -match '-Jumper' | Select-Object Name,Definition,Description
+    'Jumper Command Centre'
+    '====================='
+    Get-Help Invoke-JumperCommand
 }
 
 function Invoke-JumperCommand {
@@ -655,6 +658,7 @@ function Invoke-JumperCommand {
             rm | d | disable  Remove record from jumper label list by label: j disable <Label>
                  e | expand   Expand path variables and evaluate expressions in value of jumper link
                  g | get      Get full or filtered jumper link list: j get [match_mask]
+                 h | help     Show commulative Automatic Help Cheat Sheet
                 sh | history  Show session history of jumps
                 rd | read     Set or enhance jumper label list from JSON or text (INI) file: j read <FullPath | FileName_in_Data_Dir>
                 rv | resolve  Expand all links in list. May be need for further save a file with list of all link targets expanded
@@ -676,10 +680,18 @@ function Invoke-JumperCommand {
         })]
         [String]
         $Command = 'Help',
+
         [Parameter(Position = 1, ValueFromRemainingArguments)]
         [string[]]
         $Params
     )
+
+    if ($Debug) {
+        @{
+            Command = $Command
+        }
+        $Params
+    }
 
     switch ($Command) {
         { $_ -in ( 'Add', 'a'           ) } { Add-Jumper @Params;                     break }
@@ -718,6 +730,8 @@ function Invoke-JumperCommand {
 
     Set-Alias j     -Value Invoke-JumperCommand -Description 'Main command centre of module. Try autocomplete to get list available commands'
     Set-Alias g     -Value Use-Jumper           -Description 'Abbr for GO or GET. One more shortcut the clone of ~.'
+
+    Set-Alias jhlp  -Value Get-JumperHelp       -Description 'Shorthand to obtain Jumper reference documentation'
 
 ############################## Initialisation, Read default Data
 
