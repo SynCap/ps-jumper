@@ -270,7 +270,7 @@ function Read-JumperFile {
     Write-Verbose ( "`nLoad `e[93m{1}${RC} jumps from `e[93m{0}${RC}." -f $Path, $Jumper.Count )
 }
 
-function Get-Jumper {
+function Get-JumperLinks {
     <#
     .synopsis
         Get full or filtered jumper link list
@@ -473,7 +473,7 @@ function Use-Jumper {
             # receive information about current state:
             param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
 
-            Get-Jumper | Where-Object {$_.Label -like "$WordToComplete*" } |
+            Get-JumperLinks | Where-Object {$_.Label -like "$WordToComplete*" } |
                 Foreach-Object {
                     $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell explression' : 'path string'
                     [System.Management.Automation.CompletionResult]::new($_.Label, $_.Label, 'ParameterValue', "Jumper Link for $LinkType")
@@ -699,7 +699,7 @@ function Invoke-JumperCommand {
         { $_ -in ( 'Data', 'df'         ) } { Set-DefaultDataFile @Params -ForceRead; break }
         { $_ -in ( 'Disable', 'd', 'rm' ) } { Disable-JumperLink @Params;             break }
         { $_ -in ( 'Expand', 'e'        ) } { Expand-JumperLink @Params;              break }
-        { $_ -in ( 'Get', 'g'           ) } { Get-Jumper @Params;                     break }
+        { $_ -in ( 'Get', 'g'           ) } { Get-JumperLinks @Params;                     break }
         { $_ -in ( 'History', 'sh'      ) } { Show-JumperHistory @Params;             break }
         { $_ -in ( 'Read', 'rd', 'load' ) } { Read-JumperFile @Params;                break }
         { $_ -in ( 'Resolve', 'rv'      ) } { Resolve-JumperList;                     break }
@@ -707,20 +707,20 @@ function Invoke-JumperCommand {
         { $_ -in ( 'Save', 'sv'         ) } { Save-JumperList @Params;                break }
         { $_ -in ( 'Set', 's'           ) } { Set-JumperLink @Params;                 break }
         { $_ -in ( 'Help', 'h'          ) } { Get-JumperHelp;                         break }
-        { $_ -in ( '?', 'l', 'list'     ) } { Get-Jumper @Params;                     break }
+        { $_ -in ( '?', 'l', 'list'     ) } { Get-JumperLinks @Params;                     break }
     }
 }
 
 ############################# Module specific Aliases
 
-    Set-Alias JMP   -Value Get-Jumper           -Description "Gets the list of the Jumper links"
+    Set-Alias JMP   -Value Get-JumperLinks           -Description "Gets the list of the Jumper links"
 
     Set-Alias  ~    -Value Use-Jumper           -Description 'Jump to target using label and added path or get the resolved path'
     Set-Alias ajr   -Value Add-Jumper           -Description 'Add label to jumper list'
     Set-Alias cjr   -Value Clear-Jumper         -Description 'Clear jumper label list'
     Set-Alias djr   -Value Disable-JumperLink   -Description 'Remove record from jumper label list by label'
     Set-Alias ejr   -Value Expand-JumperLink    -Description 'Expand path variables and evaluate expressions in value of jumper link'
-    Set-Alias gjr   -Value Get-Jumper           -Description 'Get full or filtered jumper link list'
+    Set-Alias gjr   -Value Get-JumperLinks           -Description 'Get full or filtered jumper link list'
     Set-Alias rdjr  -Value Read-JumperFile      -Description 'Set or enhance jumper label list from JSON or text (INI) file'
     Set-Alias rtjr  -Value Restart-JumperModule -Description 'Trye to reload module itself'
     Set-Alias rvjr  -Value Resolve-JumperList   -Description 'Expand all links in list'
