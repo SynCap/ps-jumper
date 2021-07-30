@@ -287,8 +287,9 @@ function Get-JumperLinks {
     if (0 -eq $list.Count) {
         return ( $Filter ? "Nothing found for `e[33m$Filter`e[0m" : 'Jumper list is empty' )
     }
+    $SNo = 1
     $list | Sort-Object Name |
-        ForEach-Object -Begin {$SNo = 1} -Process {
+        ForEach-Object {
             $JumpRecord = [PSCustomObject]@{
                 ' #' = $SNo++;
                 'Label' = $_.Name;
@@ -299,6 +300,7 @@ function Get-JumperLinks {
             }
             $JumpRecord
         }
+    println "Found `e[7;33m $SNo `e[0m links"
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
@@ -306,12 +308,14 @@ function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
     .synopsis
         Just show saved history of jumps
     #>
+    $Index = 1
     if ($JumperHistory.Count) { hr } else { "`e[33mNo Jumper history yet${RC}"; return; }
     ($Reverse ? ( $JumperHistory.Reverse() ) : ( $JumperHistory )) |
-        ForEach-Object -Begin {$Index = 1} -Process {
+        ForEach-Object -Begin {} -Process {
             println "`e[32m", $Index, ". ", $RC, $_
             $index++
         }
+    println "Total: `e[33m $Index `e[0m"
 }
 
 function Set-JumperLink {
