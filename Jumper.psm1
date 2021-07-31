@@ -300,7 +300,7 @@ function Get-JumperLinks {
             }
             $JumpRecord
         }
-    println "Found `e[7;33m $SNo `e[0m links"
+    # println "Found `e[7;33m $SNo `e[0m links"
 }
 
 function Show-JumperHistory ([Alias('r')] [Switch] $Reverse) {
