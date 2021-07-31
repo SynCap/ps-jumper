@@ -489,24 +489,27 @@ function Use-Jumper {
         [String]
         $Label = '~',
 
-        <#
+        [Parameter(Position=1)]
+        [ArgumentCompleter({
             # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
-            [ArgumentCompleter({
-                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
-                if($FakeBoundParameters.ContainsKey('Label')) {
-                    $LookupPath = Expand-JumperLink $FakeBoundParameters['Label']
-                    [void]$JpDebug.add("Found <Label> param with value: $LookupPath")
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            # if($FakeBoundParameters.ContainsKey('Label')) {
+                $LookupPath = Expand-JumperLink $FakeBoundParameters.Label
+                Get-ChildItem $LookupPath | Where-Object $_.Name -like $WordToComplete | ForEach-Object {
+                    [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Mode)
                 }
-            })]
-        #>
-
-        [Parameter(position = 1)] [String] $Path = '',
+        })]
+        [String] $Path = '',
 
         # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
         [Alias('s')] [Switch]     $AsString = $false,
 
         # Instruct the Jumper to force actual jump to the place described by evaluated path
-        [Alias('f')] [Switch]     $Force = $false
+        [Alias('f')] [Switch]     $Force = $false,
+
+        # Show look around info just after jump
+        # List some entries of new location
+        [Alias('l')] [Switch]   $showLandingInfo = $false
     )
 
     switch ($Label) {
