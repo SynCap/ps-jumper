@@ -119,7 +119,6 @@ $JumperDataFile = (Join-Path $JumperDataDir $DefaultDataFile)
 $RC = "`e[0m" # Reset Console
 $Global:JumperSPF = @{}
 $itemsToShow=15 # Maximal numer of the itmes (dirs or files) to show after successful jump
-$showLandingInfo = $false # show look around info just after jump
 
 <#
     Как пользоваться JpDebug:
