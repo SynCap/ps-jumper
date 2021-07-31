@@ -479,7 +479,7 @@ function Use-Jumper {
 
             Get-JumperLinks | Where-Object {$_.Label -like "$WordToComplete*" } |
                 Foreach-Object {
-                    $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell explression' : 'path string'
+                    $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell expression' : 'path string'
                     [System.Management.Automation.CompletionResult]::new($_.Label, $_.Label, 'ParameterValue', "Jumper Link for $LinkType")
                 }
             [Enum]::GetNames([System.Environment+SpecialFolder]) | Where-Object {$_ -like '$WordToComplete*'}|
