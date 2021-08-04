@@ -140,6 +140,8 @@ function Script:println([Parameter(ValueFromPipeline)][String[]]$Params) {
     [System.Console]::WriteLine($Params -join '')
 }
 
+function vfmt([string]$msg,[string]$val,[string]$c='7') {"{0} `e[{2}m {1} `e[0m" -f $msg,$val,$c}
+
 function Get-ShellPredefinedFolder {
     param (
         [parameter(
@@ -470,6 +472,7 @@ function Resolve-Jumper {
                 g %appdata%
     #>
     [CmdletBinding()]
+    [OutputType([String])]
     param (
         # Label identifies a some place in file system
         [Parameter(position = 0)]
@@ -500,13 +503,36 @@ function Resolve-Jumper {
                     [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Mode)
                 }
         })]
-        [String] $Path = ''
+        [String] $Path
     )
+
+    Write-Verbose ( vfmt 'Label:' $Label )
+    Write-Verbose ( vfmt 'Path:'  $Path )
 
     switch ($Label) {
         '~' {
             $Target = $Env:USERPROFILE;
             break;
+        }
+
+        # Jumps using history
+        { '=' -eq $Label[0] } {
+            if ($JumperHistory.Count) {
+
+                $n = [int]($Label.Substring(1))
+                if (-1 -lt $n) {$n--}
+                if (0 -gt $n) {$n += $JumperHistory.Count}
+                $Target = $JumperHistory[$n]
+
+                $JumpMessage = "${RC} Go back to `e[33m", $Target,
+                    "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
+                $JumperHistory.RemoveAt($n)
+                break;
+            }
+            else {
+                Write-Warning 'Jumper history is empty';
+                return;
+            }
         }
 
         # Native Jumper label
@@ -519,7 +545,7 @@ function Resolve-Jumper {
         # Special folder aliases
         { $Script:TestPath = Get-ShellPredefinedFolder $Label; $TestPath -and (Test-Path $TestPath) } {
             $Target = $TestPath
-            $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
+            $JumpMessage = $RC,'Label ',"`e[33m", $Label, $RC,' is present.',
                 "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
         }
@@ -527,7 +553,8 @@ function Resolve-Jumper {
         # Directly specified expression used shell folder alias(es) #(...) and/or env vars within it
         { Test-Path ($Script:TestPath = (Expand-JumperLink $Label) ) }{
             $Target = $TestPath
-            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
+            $JumpMessage = "${RC} Label `e[33m", $Label,
+                " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
 
@@ -549,7 +576,7 @@ function Resolve-Jumper {
             $Target = [io.path]::GetFullPath([io.path]::Join($Target, $Path))
         }
     } else {
-        $Target = $PWD
+        $Target = $PWD.Path
     }
 
     Write-Verbose ($JumpMessage -join '')
@@ -598,33 +625,19 @@ function Use-Jumper {
         [Alias('l')] [Switch] $showLandingInfo = $false
     )
 
-    $Target = Resolve-Jumper $Link $Path
-
-    # Jumps using history
-    if ('=' -eq $Label[0]) {
-        if ($JumperHistory.Count) {
-
-            $n = [int]($Label.Substring(1))
-            if (-1 -lt $n) {$n--}
-            if (0 -gt $n) {$n += $JumperHistory.Count}
-            $Target = $JumperHistory[$n]
-
-            $JumpMessage = "${RC} Go back to `e[33m", $Target,
-            "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
-            $JumperHistory.RemoveAt($n)
-            break;
-        }
-        else {
-            Write-Warning 'Jumper history is empty';
-            return;
-        }
+    $Target = Resolve-Jumper -Label $Label -Path $Path
+    if (-not (Test-Path $Target)) {
+        $Target = Resolve-Jumper $Label
+        println (vfmt 'Can''t resolve' $Path '31')
     }
 
     if ($JumperHistory[-1] -ne $PWD) {
         $JumperHistory.Add( "$PWD" )
     }
 
-    Write-Verbose ($JumpMessage -join '')
+    Write-Verbose ( vfmt 'Label:' $Label  )
+    Write-Verbose ( vfmt 'Path:' $Path   )
+    Write-Verbose ( vfmt 'Target :' $Target )
 
     Set-Location $Target
 
