@@ -625,7 +625,10 @@ function Use-Jumper {
         [Alias('l')] [Switch] $showLandingInfo = $false
     )
 
-    $Target = Resolve-Jumper $Link $Path
+    $Target = Resolve-Jumper -Label $Label -Path $Path
+    if (-not (Test-Path $Target)) {
+        $Target = Resolve-Jumper $Label
+        println (vfmt 'Can''t resolve' $Path '31')
     }
 
     if ($JumperHistory[-1] -ne $PWD) {
