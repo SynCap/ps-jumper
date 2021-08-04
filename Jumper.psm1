@@ -140,6 +140,8 @@ function Script:println([Parameter(ValueFromPipeline)][String[]]$Params) {
     [System.Console]::WriteLine($Params -join '')
 }
 
+function vfmt([string]$msg,[string]$val,[string]$c='7') {"{0} `e[{2}m {1} `e[0m" -f $msg,$val,$c}
+
 function Get-ShellPredefinedFolder {
     param (
         [parameter(
@@ -504,6 +506,9 @@ function Resolve-Jumper {
         [String] $Path = ''
     )
 
+    Write-Verbose ( vfmt 'Label:' $Label )
+    Write-Verbose ( vfmt 'Path:'  $Path )
+
     switch ($Label) {
         '~' {
             $Target = $Env:USERPROFILE;
@@ -625,7 +630,9 @@ function Use-Jumper {
         $JumperHistory.Add( "$PWD" )
     }
 
-    Write-Verbose ($JumpMessage -join '')
+    Write-Verbose ( vfmt 'Label:' $Label  )
+    Write-Verbose ( vfmt 'Path:' $Path   )
+    Write-Verbose ( vfmt 'Target :' $Target )
 
     Set-Location $Target
 
