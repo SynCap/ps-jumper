@@ -503,7 +503,7 @@ function Resolve-Jumper {
                     [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Mode)
                 }
         })]
-        [String] $Path = ''
+        [String] $Path
     )
 
     Write-Verbose ( vfmt 'Label:' $Label )
@@ -545,7 +545,7 @@ function Resolve-Jumper {
         # Special folder aliases
         { $Script:TestPath = Get-ShellPredefinedFolder $Label; $TestPath -and (Test-Path $TestPath) } {
             $Target = $TestPath
-            $JumpMessage = "${RC} Label `e[33m", $Label, "${RC} is present.",
+            $JumpMessage = $RC,'Label ',"`e[33m", $Label, $RC,' is present.',
                 "Found shell folder for it: `e[33m", $Target, $RC -join ''
             break;
         }
@@ -553,7 +553,8 @@ function Resolve-Jumper {
         # Directly specified expression used shell folder alias(es) #(...) and/or env vars within it
         { Test-Path ($Script:TestPath = (Expand-JumperLink $Label) ) }{
             $Target = $TestPath
-            $JumpMessage = "${RC} Label `e[33m", $Label, " is a real path with environment variables: `e[93m", $Target, $RC
+            $JumpMessage = "${RC} Label `e[33m", $Label,
+                " is a real path with environment variables: `e[93m", $Target, $RC
             break;
         }
 
@@ -575,7 +576,7 @@ function Resolve-Jumper {
             $Target = [io.path]::GetFullPath([io.path]::Join($Target, $Path))
         }
     } else {
-        $Target = $PWD
+        $Target = $PWD.Path
     }
 
     Write-Verbose ($JumpMessage -join '')
