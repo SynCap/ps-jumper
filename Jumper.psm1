@@ -515,6 +515,26 @@ function Resolve-Jumper {
             break;
         }
 
+        # Jumps using history
+        { '=' -eq $Label[0] } {
+            if ($JumperHistory.Count) {
+
+                $n = [int]($Label.Substring(1))
+                if (-1 -lt $n) {$n--}
+                if (0 -gt $n) {$n += $JumperHistory.Count}
+                $Target = $JumperHistory[$n]
+
+                $JumpMessage = "${RC} Go back to `e[33m", $Target,
+                    "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
+                $JumperHistory.RemoveAt($n)
+                break;
+            }
+            else {
+                Write-Warning 'Jumper history is empty';
+                return;
+            }
+        }
+
         # Native Jumper label
         { [bool]$Jumper[$Label] } {
             $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Jumper[$Label], $RC
@@ -605,25 +625,6 @@ function Use-Jumper {
     )
 
     $Target = Resolve-Jumper $Link $Path
-
-    # Jumps using history
-    if ('=' -eq $Label[0]) {
-        if ($JumperHistory.Count) {
-
-            $n = [int]($Label.Substring(1))
-            if (-1 -lt $n) {$n--}
-            if (0 -gt $n) {$n += $JumperHistory.Count}
-            $Target = $JumperHistory[$n]
-
-            $JumpMessage = "${RC} Go back to `e[33m", $Target,
-            "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
-            $JumperHistory.RemoveAt($n)
-            break;
-        }
-        else {
-            Write-Warning 'Jumper history is empty';
-            return;
-        }
     }
 
     if ($JumperHistory[-1] -ne $PWD) {
