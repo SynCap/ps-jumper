@@ -470,6 +470,7 @@ function Resolve-Jumper {
                 g %appdata%
     #>
     [CmdletBinding()]
+    [OutputType([String])]
     param (
         # Label identifies a some place in file system
         [Parameter(position = 0)]
