@@ -407,7 +407,7 @@ function Resolve-JumperList {
     }
 }
 
-function Use-Jumper {
+function Resolve-Jumper {
     <#
         .synopsis
             Jump to target using label and added path or get the resolved path
@@ -469,6 +469,7 @@ function Use-Jumper {
 
                 g %appdata%
     #>
+    [CmdletBinding()]
     param (
         # Label identifies a some place in file system
         [Parameter(position = 0)]
@@ -499,17 +500,7 @@ function Use-Jumper {
                     [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Mode)
                 }
         })]
-        [String] $Path = '',
-
-        # Insturct the Jumper to not jump just evaluate the target path and return (show) it as string
-        [Alias('s')] [Switch]     $AsString = $false,
-
-        # Instruct the Jumper to force actual jump to the place described by evaluated path
-        [Alias('f')] [Switch]     $Force = $false,
-
-        # Show look around info just after jump
-        # List some entries of new location
-        [Alias('l')] [Switch]   $showLandingInfo = $false
+        [String] $Path = ''
     )
 
     switch ($Label) {
@@ -518,26 +509,7 @@ function Use-Jumper {
             break;
         }
 
-        # Jumps using history
-        { '=' -eq $Label[0] } {
-            if ($JumperHistory.Count) {
-
-                $n = [int]($Label.Substring(1))
-                if (-1 -lt $n) {$n--}
-                if (0 -gt $n) {$n += $JumperHistory.Count}
-                $Target = $JumperHistory[$n]
-
-                $JumpMessage = "${RC} Go back to `e[33m", $Target,
-                "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
-                $JumperHistory.RemoveAt($n)
-                break;
-            }
-            else {
-                Write-Warning 'Jumper history is empty';
-                return;
-            }
-        }
-
+        # Native Jumper label
         { [bool]$Jumper[$Label] } {
             $JumpMessage = "Label `e[33m", $Label, "${RC} from Jumper list: `e[33m", $Jumper[$Label], $RC
             $Target = Expand-JumperLink $Label
@@ -574,48 +546,113 @@ function Use-Jumper {
 
     if ($null -ne $Target) {
         if ($Path) {
-            $Target = Join-Path $Target $Path
-            if (Test-Path $Target) {
-                Join-Path $Target '.' -Resolve -ErrorVariable E -ErrorAction SilentlyContinue
-            }
-            if($E.Count) {
-                println "`e[41;33m", $$E[-1].Exception.Message, "`e[0m"
-            }
+            $Target = [io.path]::GetFullPath([io.path]::Join($Target, $Path))
         }
     } else {
         $Target = $PWD
     }
 
-    $Force = $Force -or (('' -eq $Path) -and !$Force)
-    if ($Force -and !$AsString) {
-        if ($JumperHistory[-1] -ne $PWD) {
-            $JumperHistory.Add( "$PWD" )
+    Write-Verbose ($JumpMessage -join '')
+
+    [String]$Target
+}
+
+function Use-Jumper {
+    [CmdletBinding()]
+    param(
+        # Label identifies a some place in file system
+        [Parameter(position = 0)]
+        [ArgumentCompleter({
+            # receive information about current state:
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+
+            Get-JumperLinks |
+                Where-Object {$_.Label -like "$WordToComplete*" } |
+                    Foreach-Object {
+                        $LinkType = $_.Label.Substring(0,1) -eq '=' ? 'powershell expression' : 'path string'
+                        [System.Management.Automation.CompletionResult]::new($_.Label, $_.Label, 'ParameterValue', "Jumper Link for $LinkType")
+                    }
+            [Enum]::GetNames([System.Environment+SpecialFolder]) |
+                Where-Object {$_ -like '$WordToComplete*'} |
+                    Foreach-Object {
+                        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', "Shell Folder Alias")
+                    }
+        })]
+        [String]
+        $Label = '~',
+
+        [Parameter(Position=1)]
+        [ArgumentCompleter({
+            # Path can be as an actual filesystem path as a some instruction that evaluates to exact path
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            # if($FakeBoundParameters.ContainsKey('Label')) {
+                $LookupPath = Expand-JumperLink $FakeBoundParameters.Label
+                Get-ChildItem $LookupPath | Where-Object $_.Name -like $WordToComplete | ForEach-Object {
+                    [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Mode)
+                }
+        })]
+        [String] $Path,
+
+        # Show look around info just after jump
+        # List some entries of new location
+        [Alias('l')] [Switch] $showLandingInfo = $false
+    )
+
+    $Target = Resolve-Jumper $Link $Path
+
+    # Jumps using history
+    if ('=' -eq $Label[0]) {
+        if ($JumperHistory.Count) {
+
+            $n = [int]($Label.Substring(1))
+            if (-1 -lt $n) {$n--}
+            if (0 -gt $n) {$n += $JumperHistory.Count}
+            $Target = $JumperHistory[$n]
+
+            $JumpMessage = "${RC} Go back to `e[33m", $Target,
+            "${RC} from`nwhere Jumper were `e[33m", $PWD, $RC
+            $JumperHistory.RemoveAt($n)
+            break;
+        }
+        else {
+            Write-Warning 'Jumper history is empty';
+            return;
+        }
+    }
+
+    if ($JumperHistory[-1] -ne $PWD) {
+        $JumperHistory.Add( "$PWD" )
+    }
+
+    Write-Verbose ($JumpMessage -join '')
+
+    Set-Location $Target
+
+    # information about location where we landed now (where we jump in)
+    if ($showLandingInfo) {
+        # actual path
+        println "`e[33m$PWD`e[0;1m"
+
+        # list some (exact $itemsToShow) dirs of the current location
+        $cntDirs = (Get-ChildItem $Target -Force -Directory).Count
+        print ((Get-ChildItem $Target -Force -Directory |
+            Select-Object -First $itemsToShow Name |
+                Foreach-Object {" `e[1;4m{0}`e[0m " -f $_.Name}) -join " "," ")
+        print "`e[0;2m"
+        if ($itemsToShow -lt $cntDirs) {
+            print "... And `e[97;2m$($cntDirs - $itemsToShow)`e[0;2m dirs more`n"
         }
 
-        if ($Verbose) { println $JumpMessage }
-        Set-Location $Target
-
-        # information about location where we landed now (where we jump in)
-        if ($showLandingInfo) {
-            # actual path
-            println "`e[33m$PWD`e[0;1m"
-
-            # list some (exact $itemsToShow) dirs of the current location
-            $cntDirs = (Get-ChildItem $Target -Force -Directory).Count
-            print ((Get-ChildItem $Target -Force -Directory | Select-Object -First $itemsToShow Name | Foreach-Object {" `e[1;4m{0}`e[0m " -f $_.Name}) -join " "," ")
-            print "`e[0;2m"
-            if ($itemsToShow -lt $cntDirs) {print "... And `e[97;2m$($cntDirs - $itemsToShow)`e[0;2m dirs more`n"}
-
-            # ...and some files
-            $cntFiles = (Get-ChildItem $Target -Force -File).Count
-            print ((Get-ChildItem $Target -Force -File | Select-Object -First $itemsToShow Name | ForEach-Object { " `e[2;4m{0}`e[0m " -f $_.Name }) -join "  ")
-            if ($itemsToShow -lt $cntFiles) {print "`e[0;2m... And `e[33;2m$($cntFiles - $itemsToShow)`e[0;2m files more"}
+        # ...and some files
+        $cntFiles = (Get-ChildItem $Target -Force -File).Count
+        print ((Get-ChildItem $Target -Force -File |
+            Select-Object -First $itemsToShow Name |
+                ForEach-Object { " `e[2;4m{0}`e[0m " -f $_.Name }) -join "  ")
+        if ($itemsToShow -lt $cntFiles) {
+            print "`e[0;2m... And `e[33;2m$($cntFiles - $itemsToShow)`e[0;2m files more"
         }
-        print "`e[0m"
     }
-    else {
-        return $Target
-    }
+    print "`e[0m"
 }
 
 function Restart-JumperModule {
@@ -722,14 +759,14 @@ function Invoke-JumperCommand {
 
 ############################# Module specific Aliases
 
-    Set-Alias JMP   -Value Get-JumperLinks           -Description "Gets the list of the Jumper links"
+    Set-Alias JMP   -Value Get-JumperLinks      -Description "Gets the list of the Jumper links"
 
     Set-Alias  ~    -Value Use-Jumper           -Description 'Jump to target using label and added path or get the resolved path'
     Set-Alias ajr   -Value Add-Jumper           -Description 'Add label to jumper list'
     Set-Alias cjr   -Value Clear-Jumper         -Description 'Clear jumper label list'
     Set-Alias djr   -Value Disable-JumperLink   -Description 'Remove record from jumper label list by label'
     Set-Alias ejr   -Value Expand-JumperLink    -Description 'Expand path variables and evaluate expressions in value of jumper link'
-    Set-Alias e     -Value Expand-JumperLink    -Description 'Expand path variables and evaluate expressions in value of jumper link'
+    Set-Alias e     -Value Resolve-Jumper       -Description 'Expand path variables and evaluate expressions in value of jumper link'
     Set-Alias gjr   -Value Get-JumperLinks      -Description 'Get full or filtered jumper link list'
     Set-Alias rdjr  -Value Read-JumperFile      -Description 'Set or enhance jumper label list from JSON or text (INI) file'
     Set-Alias rtjr  -Value Restart-JumperModule -Description 'Trye to reload module itself'
